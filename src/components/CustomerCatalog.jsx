@@ -1,20 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useData } from '../context/DataContext';
-import { Search, ShoppingBag, Phone, Mail, MapPin, Send, ArrowRight, UserCheck, X, Check } from 'lucide-react';
+import { 
+  Search, ShoppingBag, Phone, Mail, MapPin, Send, ArrowRight, 
+  UserCheck, X, Check, Menu, Grid, Shirt, Package, Leaf, Globe 
+} from 'lucide-react';
 
 export default function CustomerCatalog({ onNavigateToLogin }) {
   const { categories, subcategories, items, settings } = useData();
 
-  // Search & Filter state
+  // Navigation & Filter State
+  const [activeNav, setActiveNav] = useState('home'); // 'home' | 'categories' | 'products' | 'about' | 'contact'
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCatId, setSelectedCatId] = useState('all');
   const [selectedSubcatId, setSelectedSubcatId] = useState('all');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Modal State
   const [activeItem, setActiveItem] = useState(null);
   const [inquirySize, setInquirySize] = useState('');
-  
-  // Quick status updates
+
+  // Subcategories List for filter
   const [subcatList, setSubcatList] = useState([]);
 
   // Load subcategories when category changes
@@ -25,25 +30,28 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
     } else {
       const list = subcategories.filter(sc => sc.categoryId === selectedCatId);
       setSubcatList(list);
-      setSelectedSubcatId('all'); // Reset subcategory filter on category change
+      setSelectedSubcatId('all');
     }
   }, [selectedCatId, subcategories]);
 
-  // Handle WhatsApp Link Generation
+  // WhatsApp Link Generation
   const generateWhatsAppLink = (item, size) => {
-    // Format phone: strip non-numeric characters except +
-    const phone = settings?.phone || '';
+    const phone = settings?.phone || '+965 60607922';
     const cleanPhone = phone.replace(/[^\d+]/g, '');
-    const message = `Hello ZacTEK Team,\n\nI scanned your QR code card and would like a wholesale price quote for:\n\n*Product:* ${item.name}\n*Brand:* ${item.brand}\n*Selected Size:* ${size || 'Any size'}\n*Category:* ${categories?.find(c => c.id === item.categoryId)?.name || ''}\n\nPlease let me know the bulk pricing and availability. Thank you!`;
+    const message = `Hello ZacTEK Team,\n\nI scanned your QR code card and would like a wholesale price quote for:\n\n*Product:* ${item.name}\n*Brand:* ${item.brand || 'ONN Premiums'}\n*Selected Size:* ${size || 'Any size'}\n*Category:* ${categories?.find(c => c.id === item.categoryId)?.name || ''}\n\nPlease let me know the bulk pricing and availability. Thank you!`;
     
     return `https://wa.me/${cleanPhone.replace('+', '')}?text=${encodeURIComponent(message)}`;
   };
 
   // Filter items dynamically
   const filteredItems = items.filter(item => {
-    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          item.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()));
+    const itemName = item?.name || '';
+    const itemBrand = item?.brand || '';
+    const itemDesc = item?.description || '';
+
+    const matchesSearch = itemName.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          itemBrand.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          itemDesc.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesCategory = selectedCatId === 'all' || item.categoryId === selectedCatId;
     const matchesSubcategory = selectedSubcatId === 'all' || item.subcategoryId === selectedSubcatId;
@@ -51,160 +59,280 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
     return matchesSearch && matchesCategory && matchesSubcategory;
   });
 
-  const getSubcategoryName = (id) => subcategories.find(sc => sc.id === id)?.name || '';
+  const getSubcategoryName = (id) => subcategories.find(sc => sc.id === id)?.name || 'Garments';
+
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <div style={styles.container} className="animate-fade-in">
-      {/* Top Header */}
-      <header style={styles.header} className="glass-panel">
-        <div style={styles.headerLogo}>
+      
+      {/* 1. Top Navbar (Matching Laptop Mockup Header) */}
+      <header style={styles.navbar} className="glass-panel">
+        <div style={styles.navLogo}>
           <div style={styles.logoBadge}>ZT</div>
           <div>
-            <h1 style={styles.logoTitle}>{settings?.companyName || ''}</h1>
-            <p style={styles.logoArabic}>{settings?.companyArabic || ''}</p>
+            <h1 style={styles.logoTitle}>{settings?.companyName || 'ZacTEK Corp W.L.L'}</h1>
+            <p style={styles.logoSubtitle}>Wholesale Catalog Store</p>
           </div>
         </div>
-        <button onClick={onNavigateToLogin} style={styles.adminLink} className="btn btn-secondary">
-          <UserCheck size={16} /> Admin Portal
-        </button>
+
+        {/* Desktop Navigation Links */}
+        <nav className="desktop-nav-links" style={styles.navLinks}>
+          <button 
+            onClick={() => { setActiveNav('home'); scrollToSection('hero-section'); }} 
+            style={{ ...styles.navLink, color: activeNav === 'home' ? '#fff' : 'var(--color-text-secondary)' }}
+          >
+            Home
+            {activeNav === 'home' && <div style={styles.activeUnderline}></div>}
+          </button>
+          <button 
+            onClick={() => { setActiveNav('categories'); scrollToSection('categories-section'); }} 
+            style={{ ...styles.navLink, color: activeNav === 'categories' ? '#fff' : 'var(--color-text-secondary)' }}
+          >
+            Categories
+          </button>
+          <button 
+            onClick={() => { setActiveNav('products'); scrollToSection('products-section'); }} 
+            style={{ ...styles.navLink, color: activeNav === 'products' ? '#fff' : 'var(--color-text-secondary)' }}
+          >
+            Products
+          </button>
+          <button 
+            onClick={() => { setActiveNav('about'); scrollToSection('footer-section'); }} 
+            style={{ ...styles.navLink, color: activeNav === 'about' ? '#fff' : 'var(--color-text-secondary)' }}
+          >
+            About Us
+          </button>
+          <button 
+            onClick={() => { setActiveNav('contact'); scrollToSection('footer-section'); }} 
+            style={{ ...styles.navLink, color: activeNav === 'contact' ? '#fff' : 'var(--color-text-secondary)' }}
+          >
+            Contact
+          </button>
+        </nav>
+
+        {/* Admin Login Action & Mobile Toggle */}
+        <div style={styles.headerRight}>
+          <button onClick={onNavigateToLogin} style={styles.adminLoginBtn} className="btn btn-secondary">
+            <UserCheck size={16} /> Admin Login
+          </button>
+          <button 
+            className="mobile-nav-toggle"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            style={styles.menuToggleBtn}
+          >
+            {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </header>
 
-      {/* Hero Welcome banner */}
-      <section style={styles.heroSection}>
-        <div style={styles.heroContent}>
-          <span style={styles.welcomeTag} className="badge badge-primary">Wholesale Showroom</span>
-          <h2 style={styles.heroTitle}>Premium Garments & Trading</h2>
-          <p style={styles.heroSubtitle}>
-            Browse our complete catalogue. Scan, view, and send instant WhatsApp inquiries directly to our marketing team.
-          </p>
+      {/* Mobile Drawer Navigation */}
+      {isMobileMenuOpen && (
+        <div style={styles.mobileNavDrawer} className="glass-panel animate-fade-in no-print">
+          <button onClick={() => { scrollToSection('hero-section'); setIsMobileMenuOpen(false); }} style={styles.mobileNavLink}>Home</button>
+          <button onClick={() => { scrollToSection('categories-section'); setIsMobileMenuOpen(false); }} style={styles.mobileNavLink}>Categories</button>
+          <button onClick={() => { scrollToSection('products-section'); setIsMobileMenuOpen(false); }} style={styles.mobileNavLink}>Products</button>
+          <button onClick={() => { scrollToSection('footer-section'); setIsMobileMenuOpen(false); }} style={styles.mobileNavLink}>Contact Us</button>
+          <button onClick={() => { onNavigateToLogin(); setIsMobileMenuOpen(false); }} style={{ ...styles.mobileNavLink, color: 'var(--color-primary-hover)' }}>Admin Login</button>
+        </div>
+      )}
+
+      {/* 2. Hero Showcase Banner (Matching Laptop & Mobile Mockup) */}
+      <section id="hero-section" style={styles.heroSection}>
+        <div style={styles.heroLayout}>
           
-          {/* Large search bar */}
-          <div style={styles.searchWrapper}>
-            <Search size={20} style={styles.searchIcon} />
-            <input
-              type="text"
-              placeholder="Search product brands, vests, polo t-shirts..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={styles.searchInput}
-            />
+          {/* Hero Left Content */}
+          <div style={styles.heroContent}>
+            <div style={styles.pillBadge}>WHOLESALE CATALOG</div>
+            
+            <h1 style={styles.heroTitle}>
+              Premium Garments <br />
+              <span style={styles.titleGradient}>&amp; Trading</span>
+            </h1>
+            
+            <p style={styles.heroSubtitle}>
+              Browse our wholesale catalog of premium garments, shirts, vests and trading logistics services.
+            </p>
+
+            {/* Rounded Search Capsule Input */}
+            <div style={styles.searchCapsule}>
+              <Search size={18} style={styles.searchIcon} />
+              <input
+                type="text"
+                placeholder="Search products, brands, models and more..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={styles.searchInput}
+              />
+            </div>
           </div>
+
+          {/* Hero Right 3D Showcase Stage */}
+          <div style={styles.heroStageWrapper} className="desktop-only">
+            <div style={styles.stageGlow}></div>
+            <div style={styles.stagePedestal}>
+              <img 
+                src="/images/polo_tshirt.jpg" 
+                alt="Polo T-Shirt Showcase" 
+                style={styles.heroStageImg}
+              />
+              <div style={styles.pedestalBadge}>ZT</div>
+            </div>
+          </div>
+
         </div>
       </section>
 
-      {/* Main Catalog Area */}
-      <main style={styles.catalogArea}>
-        {/* Categories Grid Selector */}
-        <div style={styles.categoryHeading}>Browse by Category</div>
+      {/* 3. Category Cards Grid (4 Cards Row matching Mockup) */}
+      <section id="categories-section" style={styles.categoriesSection}>
         <div style={styles.categoriesGrid}>
+          
+          {/* Card 1: All Categories */}
           <button
-            onClick={() => setSelectedCatId('all')}
+            onClick={() => { setSelectedCatId('all'); setSelectedSubcatId('all'); }}
             style={{
               ...styles.catCard,
-              borderColor: selectedCatId === 'all' ? 'var(--color-primary)' : 'var(--color-border)',
-              background: selectedCatId === 'all' ? 'rgba(211, 30, 37, 0.1)' : 'var(--glass-bg)'
+              borderColor: selectedCatId === 'all' ? '#d31e25' : 'rgba(255,255,255,0.08)',
+              boxShadow: selectedCatId === 'all' ? '0 0 20px rgba(211,30,37,0.3)' : 'none',
+              background: selectedCatId === 'all' ? 'rgba(211, 30, 37, 0.12)' : 'rgba(15, 20, 32, 0.7)'
             }}
             className="glass-panel"
           >
-            <div style={styles.catIcon}>📦</div>
-            <strong style={styles.catName}>All Categories</strong>
-            <span style={styles.catCount}>{items.length} items</span>
+            <div style={{ ...styles.catIconCircle, backgroundColor: 'rgba(211, 30, 37, 0.15)', color: '#ef4444' }}>
+              <Grid size={22} />
+            </div>
+            <strong style={styles.catTitle}>All Categories</strong>
+            <span style={styles.catSubtext}>View all</span>
           </button>
-          
-          {categories.map(cat => {
-            const count = items.filter(i => i.categoryId === cat.id).length;
-            const isActive = selectedCatId === cat.id;
-            return (
-              <button
-                key={cat.id}
-                onClick={() => setSelectedCatId(cat.id)}
-                style={{
-                  ...styles.catCard,
-                  borderColor: isActive ? 'var(--color-primary)' : 'var(--color-border)',
-                  background: isActive ? 'rgba(211, 30, 37, 0.1)' : 'var(--glass-bg)'
-                }}
-                className="glass-panel"
-              >
-                <div style={styles.catIcon}>
-                  {cat.name.includes("Garments") ? "👕" : cat.name.includes("Corporate") ? "🤝" : "♻️"}
-                </div>
-                <strong style={styles.catName}>{cat.name}</strong>
-                <span style={styles.catCount}>{count} items</span>
-              </button>
-            );
-          })}
+
+          {/* Card 2: Apparel & Garments */}
+          <button
+            onClick={() => setSelectedCatId(categories[0]?.id || 'cat-1')}
+            style={{
+              ...styles.catCard,
+              borderColor: selectedCatId === (categories[0]?.id || 'cat-1') ? '#d31e25' : 'rgba(255,255,255,0.08)',
+              boxShadow: selectedCatId === (categories[0]?.id || 'cat-1') ? '0 0 20px rgba(211,30,37,0.3)' : 'none',
+              background: selectedCatId === (categories[0]?.id || 'cat-1') ? 'rgba(211, 30, 37, 0.12)' : 'rgba(15, 20, 32, 0.7)'
+            }}
+            className="glass-panel"
+          >
+            <div style={{ ...styles.catIconCircle, backgroundColor: 'rgba(34, 197, 94, 0.15)', color: '#22c55e' }}>
+              <Shirt size={22} />
+            </div>
+            <strong style={styles.catTitle}>Apparel &amp; Garments</strong>
+            <span style={styles.catSubtext}>Clothing</span>
+          </button>
+
+          {/* Card 3: Corporate Services */}
+          <button
+            onClick={() => setSelectedCatId(categories[1]?.id || 'cat-2')}
+            style={{
+              ...styles.catCard,
+              borderColor: selectedCatId === (categories[1]?.id || 'cat-2') ? '#d31e25' : 'rgba(255,255,255,0.08)',
+              boxShadow: selectedCatId === (categories[1]?.id || 'cat-2') ? '0 0 20px rgba(211,30,37,0.3)' : 'none',
+              background: selectedCatId === (categories[1]?.id || 'cat-2') ? 'rgba(211, 30, 37, 0.12)' : 'rgba(15, 20, 32, 0.7)'
+            }}
+            className="glass-panel"
+          >
+            <div style={{ ...styles.catIconCircle, backgroundColor: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b' }}>
+              <Package size={22} />
+            </div>
+            <strong style={styles.catTitle}>Corporate Services</strong>
+            <span style={styles.catSubtext}>Services</span>
+          </button>
+
+          {/* Card 4: Environmental Services */}
+          <button
+            onClick={() => setSelectedCatId(categories[2]?.id || 'cat-3')}
+            style={{
+              ...styles.catCard,
+              borderColor: selectedCatId === (categories[2]?.id || 'cat-3') ? '#d31e25' : 'rgba(255,255,255,0.08)',
+              boxShadow: selectedCatId === (categories[2]?.id || 'cat-3') ? '0 0 20px rgba(211,30,37,0.3)' : 'none',
+              background: selectedCatId === (categories[2]?.id || 'cat-3') ? 'rgba(211, 30, 37, 0.12)' : 'rgba(15, 20, 32, 0.7)'
+            }}
+            className="glass-panel"
+          >
+            <div style={{ ...styles.catIconCircle, backgroundColor: 'rgba(16, 185, 129, 0.15)', color: '#10b981' }}>
+              <Leaf size={22} />
+            </div>
+            <strong style={styles.catTitle}>Environmental Services</strong>
+            <span style={styles.catSubtext}>Eco Solutions</span>
+          </button>
+
+        </div>
+      </section>
+
+      {/* Subcategories Horizontal Scroll Filter */}
+      {selectedCatId !== 'all' && subcatList.length > 0 && (
+        <div style={styles.subcatContainer}>
+          <div style={styles.subcatScroll}>
+            <button
+              onClick={() => setSelectedSubcatId('all')}
+              style={{
+                ...styles.subcatTab,
+                background: selectedSubcatId === 'all' ? 'var(--color-primary)' : 'rgba(255,255,255,0.03)',
+                borderColor: selectedSubcatId === 'all' ? 'var(--color-primary)' : 'var(--color-border)'
+              }}
+            >
+              All Subcategories
+            </button>
+            {subcatList.map(sc => {
+              const isActive = selectedSubcatId === sc.id;
+              return (
+                <button
+                  key={sc.id}
+                  onClick={() => setSelectedSubcatId(sc.id)}
+                  style={{
+                    ...styles.subcatTab,
+                    background: isActive ? 'var(--color-primary)' : 'rgba(255,255,255,0.03)',
+                    borderColor: isActive ? 'var(--color-primary)' : 'var(--color-border)'
+                  }}
+                >
+                  {sc.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* 4. Featured Products Showcase Section */}
+      <section id="products-section" style={styles.productsSection}>
+        <div style={styles.sectionHeader}>
+          <h2 style={styles.sectionTitle}>Featured Products</h2>
+          <button 
+            onClick={() => { setSelectedCatId('all'); setSearchQuery(''); }}
+            style={styles.viewAllLink}
+          >
+            View all products &rarr;
+          </button>
         </div>
 
-        {/* Subcategories Horizontal Scroll Filter (Only if a category is selected) */}
-        {selectedCatId !== 'all' && subcatList.length > 0 && (
-          <div style={styles.subcatContainer}>
-            <div style={styles.subcatScroll}>
-              <button
-                onClick={() => setSelectedSubcatId('all')}
-                style={{
-                  ...styles.subcatTab,
-                  background: selectedSubcatId === 'all' ? 'var(--color-primary)' : 'rgba(255,255,255,0.03)',
-                  borderColor: selectedSubcatId === 'all' ? 'var(--color-primary)' : 'var(--color-border)'
-                }}
-              >
-                All Subcategories
-              </button>
-              {subcatList.map(sc => {
-                const isActive = selectedSubcatId === sc.id;
-                return (
-                  <button
-                    key={sc.id}
-                    onClick={() => setSelectedSubcatId(sc.id)}
-                    style={{
-                      ...styles.subcatTab,
-                      background: isActive ? 'var(--color-primary)' : 'rgba(255,255,255,0.03)',
-                      borderColor: isActive ? 'var(--color-primary)' : 'var(--color-border)'
-                    }}
-                  >
-                    {sc.name}
-                  </button>
-                );
-              })}
-            </div>
+        {filteredItems.length === 0 ? (
+          <div style={styles.emptyCatalog} className="glass-panel">
+            <ShoppingBag size={48} color="var(--color-text-muted)" />
+            <h3>No products found</h3>
+            <p>Try searching for a different keyword or reset category filters.</p>
           </div>
-        )}
+        ) : (
+          <div style={styles.productGrid}>
+            {filteredItems.map((item, idx) => {
+              const sizesList = item.sizes || ["M", "L", "XL", "XXL"];
+              const categoryNameTag = item.subcategoryId === 'subcat-1' ? 'POLO T-SHIRTS' : 
+                                      item.subcategoryId === 'subcat-2' ? "MEN'S VESTS" : 'GARMENTS';
 
-        {/* Active Product Grid */}
-        <div style={styles.productsSection}>
-          <div style={styles.resultBar}>
-            <div>Showing <strong>{filteredItems.length}</strong> products</div>
-            {(selectedCatId !== 'all' || searchQuery) && (
-              <button
-                onClick={() => {
-                  setSelectedCatId('all');
-                  setSelectedSubcatId('all');
-                  setSearchQuery('');
-                }}
-                style={styles.clearFilterLink}
-              >
-                Reset Filters
-              </button>
-            )}
-          </div>
-
-          {filteredItems.length === 0 ? (
-            <div style={styles.emptyCatalog} className="glass-panel">
-              <ShoppingBag size={48} color="var(--color-text-muted)" />
-              <h3>No products found</h3>
-              <p>Try searching for a different keyword or reset filters.</p>
-            </div>
-          ) : (
-            <div style={styles.productGrid}>
-              {filteredItems.map(item => (
+              return (
                 <div
                   key={item.id}
-                  onClick={() => {
-                    setActiveItem(item);
-                    setInquirySize(item.sizes?.[0] || '');
-                  }}
-                  style={styles.productCard}
-                  className="glass-panel"
+                  style={styles.productCardHorizontal}
+                  className="glass-panel product-hover-card"
                 >
+                  {/* Card Left: Large Image Preview */}
                   <div style={styles.cardImageContainer}>
                     <img
                       src={item.imageUrl}
@@ -214,160 +342,156 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
                         e.target.src = 'https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=500&auto=format&fit=crop&q=60';
                       }}
                     />
-                    <div style={styles.brandBadge}>{item.brand}</div>
+                    <div style={styles.cardCategoryBadge}>{categoryNameTag}</div>
                   </div>
 
+                  {/* Card Right: Details */}
                   <div style={styles.cardBody}>
-                    <div style={styles.cardSubcat}>{getSubcategoryName(item.subcategoryId)}</div>
                     <h3 style={styles.cardTitle}>{item.name}</h3>
-                    
+
+                    {/* Sizing Tags Row */}
                     <div style={styles.sizesRow}>
-                      {item.sizes.map((s, idx) => (
-                        <span key={idx} style={styles.sizeItem}>{s}</span>
+                      {sizesList.map((s, i) => (
+                        <span key={i} style={styles.sizeTag}>{s}</span>
                       ))}
                     </div>
 
+                    <div style={styles.originTag}>Made in India</div>
+
                     <div style={styles.cardFooter}>
-                      <span style={styles.priceTag}>{item.price}</span>
-                      <span style={styles.viewDetailsBtn}>View details <ArrowRight size={14} /></span>
+                      <button
+                        onClick={() => {
+                          setActiveItem(item);
+                          setInquirySize(item.sizes?.[0] || '');
+                        }}
+                        style={styles.viewDetailsBtn}
+                      >
+                        View Details &rarr;
+                      </button>
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </main>
+              );
+            })}
+          </div>
+        )}
+      </section>
 
-      {/* Customer-Facing Contact Card Footer */}
-      <footer style={styles.footer} className="glass-panel">
-        <div style={styles.footerMain}>
-          {/* Card Left Layout */}
+      {/* 5. Footer Business Card & 3D Globe Delivery Graphic (Matching Laptop Mockup Footer) */}
+      <footer id="footer-section" style={styles.footer} className="glass-panel">
+        <div style={styles.footerGrid}>
+          
+          {/* Left Column: Company & Profile info */}
           <div style={styles.footerLeft}>
-            <h3 style={styles.footerLogo}>{settings?.companyName || ''}</h3>
-            <p style={styles.footerArabic}>{settings?.companyArabic || ''}</p>
-            <div style={styles.divider}></div>
-            
-            <div style={styles.agentBox}>
-              <div style={styles.agentAvatar}>
-                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2.5" fill="none" style={{color: '#fff'}}>
+            <div style={styles.footerBrandRow}>
+              <div style={styles.footerLogoBadge}>ZT</div>
+              <div>
+                <h3 style={styles.footerLogoTitle}>{settings?.companyName || 'ZacTEK Corp W.L.L'}</h3>
+                <p style={styles.footerArabic}>{settings?.companyArabic || 'شركة زاك تيك ذ.م.م'}</p>
+              </div>
+            </div>
+
+            <div style={styles.managerBadge}>
+              <div style={styles.avatarCircle}>
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2.5" fill="none" style={{ color: '#fff' }}>
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                   <circle cx="12" cy="7" r="4" />
                 </svg>
               </div>
               <div>
-                <strong style={styles.agentName}>{settings?.managerName || ''}</strong>
-                <div style={styles.agentRole}>{settings?.managerRole || ''}</div>
+                <strong style={styles.managerName}>{settings?.managerName || 'Kumar'}</strong>
+                <div style={styles.managerRole}>{settings?.managerRole || 'Marketing Manager'}</div>
               </div>
             </div>
           </div>
 
-          {/* Card Right Layout */}
-          <div style={styles.footerRight}>
-            <div style={styles.contactDetails}>
-              <a href={`tel:${settings?.phone || ''}`} style={styles.contactLink}>
-                <div style={styles.contactIconCircle}><Phone size={14} fill="#fff" color="var(--color-primary)" /></div>
-                <span>{settings?.phone || ''}</span>
+          {/* Middle Column: Contact Details */}
+          <div style={styles.footerMiddle}>
+            <div style={styles.contactList}>
+              <a href={`tel:${settings?.phone || '+965 60607922'}`} style={styles.contactItem}>
+                <div style={styles.contactIconCircle}><Phone size={12} fill="#fff" color="#d31e25" /></div>
+                <span>{settings?.phone || '+965 60607922'}</span>
               </a>
-              <a href={`mailto:${settings?.email || ''}`} style={styles.contactLink}>
-                <div style={styles.contactIconCircle}><Mail size={14} fill="#fff" color="var(--color-primary)" /></div>
-                <span style={styles.emailText}>{settings?.email || ''}</span>
+
+              <a href={`mailto:${settings?.email || 'zactekaccouts@gmail.com'}`} style={styles.contactItem}>
+                <div style={styles.contactIconCircle}><Mail size={12} fill="#fff" color="#d31e25" /></div>
+                <span>{settings?.email || 'zactekaccouts@gmail.com'}</span>
               </a>
-              <div style={styles.contactLink}>
-                <div style={styles.contactIconCircle}><MapPin size={14} fill="#fff" color="var(--color-primary)" /></div>
-                <span style={styles.addrText}>{settings?.address || ''}</span>
+
+              <div style={styles.contactItem}>
+                <div style={styles.contactIconCircle}><MapPin size={12} fill="#fff" color="#d31e25" /></div>
+                <span style={styles.addressText}>{settings?.address || 'Abdulla Al-Mubarak Al-Sabah Street, Sharq, Kuwait City, Kuwait Complex 2, Zone 4'}</span>
               </div>
             </div>
           </div>
+
+          {/* Right Column: 3D Logistics Globe Illustration */}
+          <div style={styles.footerRight} className="desktop-only">
+            <div style={styles.globeGraphicBox}>
+              <div style={styles.globeGlow}></div>
+              <Globe size={90} color="#d31e25" style={{ opacity: 0.8 }} />
+              <div style={styles.deliveryBadge}>
+                🚚 Logistics &amp; Shipping Active
+              </div>
+            </div>
+          </div>
+
         </div>
 
         <div style={styles.footerBottom}>
-          <p>© {new Date().getFullYear()} ZacTEK Corporation. All Rights Reserved. Delivering Trust.</p>
+          <p>© {new Date().getFullYear()} ZacTEK Corporation. All Rights Reserved. Premium Garments &amp; Trading.</p>
         </div>
       </footer>
 
-      {/* Product Detail & WhatsApp Inquiry Modal */}
+      {/* 6. Product Detail & WhatsApp Inquiry Modal */}
       {activeItem && (
-        <div style={styles.modalOverlay}>
-          <div style={styles.modalContent} className="glass-panel animate-fade-in">
-            <button onClick={() => setActiveItem(null)} style={styles.modalClose}>
-              <X size={22} />
+        <div style={styles.modalOverlay} onClick={() => setActiveItem(null)}>
+          <div style={styles.modalContent} onClick={(e) => e.stopPropagation()} className="glass-panel animate-fade-in">
+            
+            <button style={styles.modalClose} onClick={() => setActiveItem(null)}>
+              <X size={20} />
             </button>
 
             <div style={styles.modalBody}>
-              {/* Product Visual */}
+              {/* Product Image */}
               <div style={styles.modalImageWrapper}>
-                <img
-                  src={activeItem.imageUrl}
-                  alt={activeItem.name}
-                  style={styles.modalImage}
-                  onError={(e) => {
-                    e.target.src = 'https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=500&auto=format&fit=crop&q=60';
-                  }}
-                />
+                <img src={activeItem.imageUrl} alt={activeItem.name} style={styles.modalImage} />
               </div>
 
-              {/* Product Info & Inquiry Form */}
+              {/* Product Details & WhatsApp Quote Trigger */}
               <div style={styles.modalDetails}>
-                <span style={styles.modalBrand}>{activeItem.brand}</span>
+                <div style={styles.modalBrand}>{activeItem.brand || 'ONN Premiums'}</div>
                 <h2 style={styles.modalTitle}>{activeItem.name}</h2>
-                <span className="badge badge-primary" style={{ marginBottom: '16px', display: 'inline-block' }}>
-                  {getSubcategoryName(activeItem.subcategoryId)}
-                </span>
-                
                 <p style={styles.modalDesc}>{activeItem.description}</p>
 
-                {/* Specific details */}
-                <div style={styles.specsContainer}>
-                  {activeItem.details?.origin && (
-                    <div style={styles.specRow}>
-                      <strong>Origin:</strong> <span>{activeItem.details.origin}</span>
-                    </div>
-                  )}
-                  {activeItem.details?.fabric && (
-                    <div style={styles.specRow}>
-                      <strong>Material:</strong> <span>{activeItem.details.fabric}</span>
-                    </div>
-                  )}
-                  {activeItem.details?.packaging && (
-                    <div style={styles.specRow}>
-                      <strong>Packaging:</strong> <span>{activeItem.details.packaging}</span>
-                    </div>
-                  )}
+                {/* Sizing Picker */}
+                <div style={styles.sizingPicker}>
+                  <div style={styles.sizeTitle}>Select Preferred Size:</div>
+                  <div style={styles.sizesGrid}>
+                    {activeItem.sizes?.map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => setInquirySize(size)}
+                        style={{
+                          ...styles.sizeButton,
+                          backgroundColor: inquirySize === size ? 'var(--color-primary)' : 'rgba(255,255,255,0.05)',
+                          borderColor: inquirySize === size ? 'var(--color-primary)' : 'var(--color-border)',
+                          color: inquirySize === size ? '#fff' : 'var(--color-text-secondary)'
+                        }}
+                      >
+                        {size} {inquirySize === size && <Check size={12} style={{ marginLeft: '4px' }} />}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
-                {/* Sizing Picker for Inquiry */}
-                {activeItem.sizes && activeItem.sizes.length > 0 && (
-                  <div style={styles.sizingPicker}>
-                    <div style={styles.sizeTitle}>Select size for WhatsApp inquiry:</div>
-                    <div style={styles.sizesGrid}>
-                      {activeItem.sizes.map(size => {
-                        const isSelected = inquirySize === size;
-                        return (
-                          <button
-                            key={size}
-                            type="button"
-                            onClick={() => setInquirySize(size)}
-                            style={{
-                              ...styles.sizeButton,
-                              background: isSelected ? 'var(--color-primary)' : 'rgba(255,255,255,0.03)',
-                              borderColor: isSelected ? 'var(--color-primary)' : 'var(--color-border)',
-                              color: '#fff'
-                            }}
-                          >
-                            {size} {isSelected && <Check size={12} style={{marginLeft: '4px', display: 'inline'}} />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
+                {/* Price Display */}
                 <div style={styles.priceContainer}>
                   <div style={styles.priceLabel}>Wholesale Pricing</div>
-                  <div style={styles.priceVal}>{activeItem.price}</div>
+                  <div style={styles.priceVal}>{activeItem.price || 'Wholesale (Contact for Quote)'}</div>
                 </div>
 
+                {/* WhatsApp Link Button */}
                 <a
                   href={generateWhatsAppLink(activeItem, inquirySize)}
                   target="_blank"
@@ -375,164 +499,290 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
                   className="btn btn-primary"
                   style={styles.whatsappBtn}
                 >
-                  <Phone size={18} fill="#fff" /> Inquire on WhatsApp
+                  <Send size={18} /> Send Instant WhatsApp Inquiry
                 </a>
               </div>
             </div>
+
           </div>
         </div>
       )}
+
     </div>
   );
 }
 
 const styles = {
   container: {
-    maxWidth: '1200px',
-    margin: '0 auto',
-    padding: '20px',
-    flex: 1,
+    minHeight: '100vh',
+    backgroundColor: '#07090e',
+    color: '#fff',
+    textAlign: 'left',
+    paddingBottom: '20px',
   },
-  header: {
-    padding: '16px 24px',
+  
+  /* Navbar */
+  navbar: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '30px',
-    flexWrap: 'wrap',
-    gap: '12px',
+    padding: '16px 32px',
+    backgroundColor: 'rgba(11, 15, 25, 0.95)',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+    position: 'sticky',
+    top: 0,
+    zIndex: 100,
   },
-  headerLogo: {
+  navLogo: {
     display: 'flex',
     alignItems: 'center',
     gap: '12px',
   },
   logoBadge: {
-    width: '44px',
-    height: '44px',
-    borderRadius: '10px',
-    backgroundColor: 'var(--color-primary)',
+    width: '36px',
+    height: '36px',
+    backgroundColor: '#d31e25',
     color: '#fff',
-    fontSize: '1.25rem',
     fontWeight: '800',
+    borderRadius: '8px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: '0 0 15px var(--color-primary-glow)',
+    fontSize: '0.95rem',
   },
   logoTitle: {
-    fontSize: '1.25rem',
+    fontSize: '1.05rem',
     fontWeight: '700',
-    lineHeight: '1.1',
+    color: '#fff',
+    margin: 0,
+    lineHeight: '1.2',
   },
-  logoArabic: {
-    fontSize: '0.65rem',
+  logoSubtitle: {
+    fontSize: '0.7rem',
     color: 'var(--color-text-secondary)',
-    fontFamily: 'system-ui, sans-serif',
+    margin: 0,
   },
-  adminLink: {
+  navLinks: {
+    display: 'flex',
+    gap: '28px',
+    alignItems: 'center',
+  },
+  navLink: {
+    background: 'none',
+    border: 'none',
+    fontSize: '0.9rem',
+    fontWeight: '500',
+    cursor: 'pointer',
+    position: 'relative',
+    padding: '4px 0',
+  },
+  activeUnderline: {
+    position: 'absolute',
+    bottom: '-4px',
+    left: 0,
+    right: 0,
+    height: '2px',
+    backgroundColor: '#d31e25',
+    borderRadius: '2px',
+  },
+  headerRight: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+  },
+  adminLoginBtn: {
     fontSize: '0.85rem',
+    padding: '8px 16px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
   },
+  menuToggleBtn: {
+    background: 'none',
+    border: 'none',
+    color: '#fff',
+    cursor: 'pointer',
+    padding: '4px',
+    display: 'none',
+  },
+  mobileNavDrawer: {
+    padding: '16px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+    backgroundColor: '#0c0f1b',
+    borderBottom: '1px solid var(--color-border)',
+  },
+  mobileNavLink: {
+    background: 'none',
+    border: 'none',
+    color: '#fff',
+    textAlign: 'left',
+    fontSize: '1rem',
+    padding: '8px 0',
+    cursor: 'pointer',
+  },
+
+  /* Hero Section */
   heroSection: {
-    textAlign: 'center',
-    padding: '40px 20px',
-    marginBottom: '30px',
-    background: 'radial-gradient(circle at center, rgba(211, 30, 37, 0.08) 0%, transparent 60%)',
-    borderRadius: '20px',
-  },
-  heroContent: {
-    maxWidth: '700px',
+    padding: '60px 32px 40px 32px',
+    maxWidth: '1300px',
     margin: '0 auto',
   },
-  welcomeTag: {
+  heroLayout: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+    gap: '40px',
+    alignItems: 'center',
+  },
+  heroContent: {
+    maxWidth: '580px',
+  },
+  pillBadge: {
+    display: 'inline-block',
+    padding: '4px 14px',
+    borderRadius: '20px',
+    border: '1px solid #d31e25',
+    color: '#d31e25',
+    fontSize: '0.75rem',
+    fontWeight: '700',
+    letterSpacing: '1px',
     marginBottom: '16px',
   },
   heroTitle: {
-    fontSize: '2.5rem',
+    fontSize: '2.8rem',
     fontWeight: '800',
-    marginBottom: '12px',
-    fontFamily: 'var(--font-heading)',
+    color: '#fff',
+    lineHeight: '1.15',
+    marginBottom: '16px',
+  },
+  titleGradient: {
+    color: '#ff4d54',
   },
   heroSubtitle: {
-    color: 'var(--color-text-secondary)',
     fontSize: '1rem',
-    marginBottom: '30px',
+    color: 'var(--color-text-secondary)',
     lineHeight: '1.6',
+    marginBottom: '28px',
   },
-  searchWrapper: {
-    position: 'relative',
-    maxWidth: '560px',
-    margin: '0 auto',
+  searchCapsule: {
+    display: 'flex',
+    alignItems: 'center',
+    backgroundColor: 'rgba(15, 20, 32, 0.9)',
+    border: '1px solid rgba(255, 255, 255, 0.12)',
+    borderRadius: '30px',
+    padding: '6px 20px',
+    maxWidth: '480px',
+    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
   },
   searchIcon: {
-    position: 'absolute',
-    left: '16px',
-    top: '50%',
-    transform: 'translateY(-50%)',
     color: 'var(--color-text-muted)',
+    marginRight: '12px',
   },
   searchInput: {
-    width: '100%',
-    padding: '16px 16px 16px 48px',
-    backgroundColor: 'var(--glass-bg)',
-    backdropFilter: 'blur(var(--glass-blur))',
-    border: '1px solid var(--color-border)',
-    borderRadius: '30px',
+    background: 'none',
+    border: 'none',
     color: '#fff',
-    fontSize: '1rem',
+    width: '100%',
+    padding: '8px 0',
+    fontSize: '0.9rem',
     outline: 'none',
-    transition: 'all var(--transition-normal)',
-    boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.2)',
   },
-  catalogArea: {
-    marginBottom: '60px',
+  heroStageWrapper: {
+    position: 'relative',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  categoryHeading: {
-    fontSize: '1.25rem',
-    fontWeight: '700',
-    marginBottom: '16px',
-    fontFamily: 'var(--font-heading)',
+  stageGlow: {
+    position: 'absolute',
+    width: '280px',
+    height: '280px',
+    borderRadius: '50%',
+    backgroundColor: 'rgba(211, 30, 37, 0.25)',
+    filter: 'blur(60px)',
+  },
+  stagePedestal: {
+    width: '320px',
+    height: '260px',
+    borderRadius: '20px',
+    overflow: 'hidden',
+    position: 'relative',
+    border: '1px solid rgba(211, 30, 37, 0.4)',
+    boxShadow: '0 20px 40px rgba(0,0,0,0.6)',
+    backgroundColor: '#1b223c',
+  },
+  heroStageImg: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+  },
+  pedestalBadge: {
+    position: 'absolute',
+    bottom: '16px',
+    right: '16px',
+    width: '36px',
+    height: '36px',
+    backgroundColor: '#d31e25',
+    color: '#fff',
+    fontWeight: '800',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  /* Categories Grid Section */
+  categoriesSection: {
+    padding: '0 32px 40px 32px',
+    maxWidth: '1300px',
+    margin: '0 auto',
   },
   categoriesGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
     gap: '16px',
-    marginBottom: '30px',
   },
   catCard: {
     padding: '20px',
-    textAlign: 'center',
+    borderRadius: '16px',
     cursor: 'pointer',
-    width: '100%',
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: 'flex-start',
+    border: '1px solid rgba(255,255,255,0.08)',
     transition: 'all var(--transition-normal)',
   },
-  catIcon: {
-    fontSize: '2rem',
-    marginBottom: '10px',
+  catIconCircle: {
+    width: '44px',
+    height: '44px',
+    borderRadius: '12px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: '12px',
   },
-  catName: {
+  catTitle: {
     color: '#fff',
     fontSize: '0.95rem',
-    display: 'block',
     marginBottom: '4px',
   },
-  catCount: {
-    fontSize: '0.75rem',
+  catSubtext: {
     color: 'var(--color-text-muted)',
+    fontSize: '0.75rem',
   },
+
+  /* Subcategories Scroll */
   subcatContainer: {
-    width: '100%',
-    overflowX: 'auto',
-    marginBottom: '30px',
-    paddingBottom: '8px',
+    padding: '0 32px 30px 32px',
+    maxWidth: '1300px',
+    margin: '0 auto',
   },
   subcatScroll: {
     display: 'flex',
     gap: '10px',
+    overflowX: 'auto',
+    paddingBottom: '8px',
   },
   subcatTab: {
     padding: '8px 20px',
@@ -543,26 +793,32 @@ const styles = {
     fontWeight: '500',
     cursor: 'pointer',
     whiteSpace: 'nowrap',
-    transition: 'all var(--transition-fast)',
   },
+
+  /* Featured Products Section */
   productsSection: {
-    marginTop: '20px',
+    padding: '0 32px 60px 32px',
+    maxWidth: '1300px',
+    margin: '0 auto',
   },
-  resultBar: {
+  sectionHeader: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '20px',
-    fontSize: '0.9rem',
-    color: 'var(--color-text-secondary)',
+    marginBottom: '24px',
   },
-  clearFilterLink: {
+  sectionTitle: {
+    fontSize: '1.5rem',
+    fontWeight: '700',
+    color: '#fff',
+  },
+  viewAllLink: {
     background: 'none',
     border: 'none',
-    color: 'var(--color-primary-hover)',
+    color: '#ff4d54',
     cursor: 'pointer',
-    fontWeight: '500',
-    fontSize: '0.875rem',
+    fontSize: '0.9rem',
+    fontWeight: '600',
   },
   emptyCatalog: {
     textAlign: 'center',
@@ -571,196 +827,220 @@ const styles = {
   },
   productGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))',
     gap: '24px',
   },
-  productCard: {
+  productCardHorizontal: {
+    display: 'flex',
     borderRadius: '16px',
     overflow: 'hidden',
-    cursor: 'pointer',
-    display: 'flex',
-    flexDirection: 'column',
-    transition: 'all var(--transition-normal)',
+    border: '1px solid rgba(255,255,255,0.08)',
+    backgroundColor: 'rgba(15, 20, 32, 0.7)',
   },
   cardImageContainer: {
-    height: '220px',
+    width: '42%',
     position: 'relative',
     backgroundColor: '#1b223c',
-    overflow: 'hidden',
+    minHeight: '200px',
   },
   cardImage: {
     width: '100%',
     height: '100%',
     objectFit: 'cover',
-    transition: 'transform var(--transition-slow)',
   },
-  brandBadge: {
+  cardCategoryBadge: {
     position: 'absolute',
-    top: '12px',
-    left: '12px',
+    top: '10px',
+    left: '10px',
     backgroundColor: 'rgba(7, 9, 14, 0.85)',
-    border: '1px solid var(--color-border)',
+    border: '1px solid rgba(255,255,255,0.1)',
     color: '#fff',
-    padding: '4px 8px',
+    padding: '3px 8px',
     borderRadius: '4px',
-    fontSize: '0.7rem',
-    fontWeight: '600',
-    textTransform: 'uppercase',
+    fontSize: '0.65rem',
+    fontWeight: '700',
+    letterSpacing: '0.5px',
   },
   cardBody: {
+    width: '58%',
     padding: '20px',
     display: 'flex',
     flexDirection: 'column',
-    flex: 1,
-  },
-  cardSubcat: {
-    fontSize: '0.75rem',
-    color: 'var(--color-primary-hover)',
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    marginBottom: '6px',
   },
   cardTitle: {
     fontSize: '1.05rem',
-    fontWeight: '600',
+    fontWeight: '700',
     color: '#fff',
-    marginBottom: '12px',
-    lineHeight: '1.3',
+    marginBottom: '10px',
   },
   sizesRow: {
     display: 'flex',
+    gap: '6px',
     flexWrap: 'wrap',
-    gap: '4px',
-    marginBottom: '16px',
+    marginBottom: '10px',
   },
-  sizeItem: {
+  sizeTag: {
     fontSize: '0.7rem',
-    background: 'rgba(255, 255, 255, 0.05)',
+    background: 'rgba(255,255,255,0.06)',
     border: '1px solid var(--color-border)',
     color: 'var(--color-text-secondary)',
-    padding: '2px 6px',
-    borderRadius: '3px',
+    padding: '2px 8px',
+    borderRadius: '4px',
+    fontWeight: '500',
+  },
+  originTag: {
+    fontSize: '0.75rem',
+    color: 'var(--color-text-muted)',
+    marginBottom: '16px',
   },
   cardFooter: {
     marginTop: 'auto',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderTop: '1px solid var(--color-border)',
-    paddingTop: '14px',
-  },
-  priceTag: {
-    fontSize: '0.85rem',
-    color: 'var(--color-text-secondary)',
-    fontWeight: '500',
   },
   viewDetailsBtn: {
-    fontSize: '0.8rem',
-    color: 'var(--color-text-primary)',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px',
-    fontWeight: '500',
+    background: 'none',
+    border: 'none',
+    color: '#fff',
+    fontSize: '0.85rem',
+    fontWeight: '600',
+    cursor: 'pointer',
+    padding: 0,
   },
 
-  /* Customer Footer business card template */
+  /* Footer */
   footer: {
-    padding: '40px 30px',
-    marginTop: '60px',
-    backgroundColor: 'rgba(15, 19, 32, 0.95)',
+    margin: '40px 32px 0 32px',
+    padding: '40px 32px 20px 32px',
+    backgroundColor: 'rgba(11, 15, 25, 0.95)',
+    borderRadius: '20px',
   },
-  footerMain: {
+  footerGrid: {
     display: 'grid',
-    gridTemplateColumns: '1fr',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
     gap: '30px',
     paddingBottom: '30px',
-    borderBottom: '1px solid var(--color-border)',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
   },
   footerLeft: {
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'flex-start',
+    gap: '20px',
   },
-  footerLogo: {
-    fontSize: '1.75rem',
-    color: '#fff',
-    fontFamily: 'var(--font-heading)',
-    fontWeight: '800',
-  },
-  footerArabic: {
-    fontSize: '0.8rem',
-    color: 'var(--color-text-secondary)',
-    marginTop: '4px',
-    fontFamily: 'system-ui, sans-serif',
-  },
-  divider: {
-    width: '60px',
-    height: '2px',
-    backgroundColor: 'var(--color-primary)',
-    margin: '16px 0',
-  },
-  agentBox: {
+  footerBrandRow: {
     display: 'flex',
     alignItems: 'center',
     gap: '12px',
-    background: 'rgba(255,255,255,0.02)',
-    padding: '10px 16px',
-    borderRadius: '8px',
-    border: '1px solid var(--color-border)',
   },
-  agentAvatar: {
-    width: '36px',
-    height: '36px',
+  footerLogoBadge: {
+    width: '40px',
+    height: '40px',
+    backgroundColor: '#d31e25',
+    color: '#fff',
+    fontWeight: '800',
+    borderRadius: '10px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '1rem',
+  },
+  footerLogoTitle: {
+    fontSize: '1.15rem',
+    fontWeight: '700',
+    color: '#fff',
+    margin: 0,
+  },
+  footerArabic: {
+    fontSize: '0.75rem',
+    color: 'var(--color-text-secondary)',
+    margin: '2px 0 0 0',
+  },
+  managerBadge: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    backgroundColor: 'rgba(255,255,255,0.02)',
+    border: '1px solid var(--color-border)',
+    padding: '10px 14px',
+    borderRadius: '12px',
+    width: 'fit-content',
+  },
+  avatarCircle: {
+    width: '34px',
+    height: '34px',
     borderRadius: '50%',
-    backgroundColor: 'var(--color-primary)',
+    backgroundColor: '#d31e25',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  agentName: {
-    fontSize: '0.95rem',
+  managerName: {
+    fontSize: '0.9rem',
     color: '#fff',
   },
-  agentRole: {
+  managerRole: {
     fontSize: '0.75rem',
-    color: 'var(--color-text-secondary)',
+    color: 'var(--color-text-muted)',
   },
-  footerRight: {
+  footerMiddle: {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
   },
-  contactDetails: {
+  contactList: {
     display: 'flex',
     flexDirection: 'column',
     gap: '14px',
   },
-  contactLink: {
+  contactItem: {
     display: 'flex',
     alignItems: 'center',
     gap: '12px',
     color: 'var(--color-text-secondary)',
     textDecoration: 'none',
-    fontSize: '0.9rem',
-    transition: 'color var(--transition-fast)',
+    fontSize: '0.85rem',
   },
   contactIconCircle: {
     width: '26px',
     height: '26px',
     borderRadius: '50%',
-    backgroundColor: 'rgba(211, 30, 37, 0.1)',
-    border: '1px solid rgba(211, 30, 37, 0.2)',
+    backgroundColor: 'rgba(211, 30, 37, 0.15)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
   },
-  emailText: {
-    wordBreak: 'break-all',
-  },
-  addrText: {
+  addressText: {
     lineHeight: '1.4',
-    fontSize: '0.825rem',
+    fontSize: '0.8rem',
+  },
+  footerRight: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  globeGraphicBox: {
+    position: 'relative',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  globeGlow: {
+    position: 'absolute',
+    width: '120px',
+    height: '120px',
+    borderRadius: '50%',
+    backgroundColor: 'rgba(211, 30, 37, 0.3)',
+    filter: 'blur(30px)',
+  },
+  deliveryBadge: {
+    marginTop: '10px',
+    fontSize: '0.75rem',
+    fontWeight: '600',
+    color: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    padding: '4px 12px',
+    borderRadius: '20px',
+    border: '1px solid var(--color-border)',
   },
   footerBottom: {
     paddingTop: '20px',
@@ -769,7 +1049,7 @@ const styles = {
     color: 'var(--color-text-muted)',
   },
 
-  /* Product Details Modal */
+  /* Modal */
   modalOverlay: {
     position: 'fixed',
     top: 0,
@@ -785,7 +1065,7 @@ const styles = {
   },
   modalContent: {
     width: '100%',
-    maxWidth: '850px',
+    maxWidth: '800px',
     backgroundColor: '#0c0f1b',
     border: '1px solid rgba(255,255,255,0.1)',
     borderRadius: '20px',
@@ -806,16 +1086,15 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 10,
-    transition: 'all var(--transition-fast)',
   },
   modalBody: {
     display: 'grid',
-    gridTemplateColumns: '1fr',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
     maxHeight: '90vh',
     overflowY: 'auto',
   },
   modalImageWrapper: {
-    height: '320px',
+    height: '350px',
     backgroundColor: '#1b223c',
     position: 'relative',
   },
@@ -825,20 +1104,20 @@ const styles = {
     objectFit: 'cover',
   },
   modalDetails: {
-    padding: '30px',
+    padding: '28px',
     display: 'flex',
     flexDirection: 'column',
   },
   modalBrand: {
     fontSize: '0.8rem',
     fontWeight: '600',
-    color: 'var(--color-primary-hover)',
+    color: '#ff4d54',
     textTransform: 'uppercase',
     letterSpacing: '1px',
     marginBottom: '4px',
   },
   modalTitle: {
-    fontSize: '1.75rem',
+    fontSize: '1.6rem',
     fontWeight: '700',
     color: '#fff',
     lineHeight: '1.2',
@@ -846,33 +1125,18 @@ const styles = {
   },
   modalDesc: {
     color: 'var(--color-text-secondary)',
-    fontSize: '0.95rem',
+    fontSize: '0.9rem',
     lineHeight: '1.6',
     marginBottom: '20px',
   },
-  specsContainer: {
-    backgroundColor: 'rgba(255,255,255,0.02)',
-    border: '1px solid var(--color-border)',
-    borderRadius: '8px',
-    padding: '16px',
-    marginBottom: '20px',
-  },
-  specRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    fontSize: '0.85rem',
-    paddingBottom: '8px',
-    marginBottom: '8px',
-    borderBottom: '1px solid rgba(255,255,255,0.04)',
-  },
   sizingPicker: {
-    marginBottom: '24px',
+    marginBottom: '20px',
   },
   sizeTitle: {
     fontSize: '0.85rem',
     fontWeight: '500',
     color: 'var(--color-text-secondary)',
-    marginBottom: '10px',
+    marginBottom: '8px',
   },
   sizesGrid: {
     display: 'flex',
@@ -880,59 +1144,36 @@ const styles = {
     gap: '8px',
   },
   sizeButton: {
-    padding: '8px 16px',
+    padding: '6px 14px',
     borderRadius: '8px',
     border: '1px solid var(--color-border)',
     cursor: 'pointer',
     fontSize: '0.85rem',
-    transition: 'all var(--transition-fast)',
     display: 'flex',
     alignItems: 'center',
   },
   priceContainer: {
-    marginBottom: '24px',
+    marginBottom: '20px',
   },
   priceLabel: {
-    fontSize: '0.8rem',
+    fontSize: '0.75rem',
     color: 'var(--color-text-muted)',
     textTransform: 'uppercase',
     fontWeight: '600',
   },
   priceVal: {
-    fontSize: '1.25rem',
+    fontSize: '1.2rem',
     fontWeight: '700',
     color: '#fff',
     marginTop: '2px',
   },
   whatsappBtn: {
     width: '100%',
-    padding: '14px',
-    fontSize: '1rem',
-  },
-
-  // Desktop media query overrides
-  '@media (min-width: 768px)': {
-    modalBody: {
-      gridTemplateColumns: '1fr 1.2fr',
-      maxHeight: 'none',
-    },
-    modalImageWrapper: {
-      height: '100%',
-    },
-    footerMain: {
-      gridTemplateColumns: '1.2fr 1fr',
-    }
+    padding: '12px',
+    fontSize: '0.95rem',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '8px',
   }
 };
-
-// Simple media query fallback for React style sheet
-if (typeof window !== 'undefined') {
-  const applyLayout = () => {
-    const isDesktop = window.innerWidth >= 768;
-    styles.modalBody.gridTemplateColumns = isDesktop ? '1fr 1.2fr' : '1fr';
-    styles.modalImageWrapper.height = isDesktop ? '100%' : '320px';
-    styles.footerMain.gridTemplateColumns = isDesktop ? '1.2fr 1fr' : '1fr';
-  };
-  window.addEventListener('resize', applyLayout);
-  applyLayout();
-}

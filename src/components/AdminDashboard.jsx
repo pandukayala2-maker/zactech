@@ -55,41 +55,37 @@ export default function AdminDashboard({ onBackToCatalog }) {
   ];
 
   return (
-    <div style={styles.dashboardContainer} className="app-container">
+    <div className="admin-dashboard-container app-container">
       {/* Top Banner (No-print) */}
-      <header style={styles.topHeader} className="glass-panel no-print">
-        <div style={styles.headerLeft}>
-          <button style={styles.menuToggle} onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+      <header className="admin-top-header glass-panel no-print">
+        <div className="admin-header-left">
+          <button className="admin-menu-toggle" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
             {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
-          <div style={styles.logoBadge}>ZT</div>
+          <div className="admin-logo-badge">ZT</div>
           <div>
-            <h1 style={styles.headerTitle}>{settings.companyName}</h1>
-            <span style={styles.headerRole}>Wholesale Admin Panel</span>
+            <h1 className="admin-header-title">{settings.companyName}</h1>
+            <span className="admin-header-role">Wholesale Admin Panel</span>
           </div>
         </div>
 
-        <div style={styles.headerActions}>
-          <button onClick={onBackToCatalog} className="btn btn-secondary" style={styles.actionBtn}>
+        <div className="admin-header-actions">
+          <button onClick={onBackToCatalog} className="btn btn-secondary admin-action-btn">
             <Eye size={16} /> View Shop Catalog
           </button>
-          <button onClick={handleLogout} className="btn btn-danger" style={styles.actionBtn}>
+          <button onClick={handleLogout} className="btn btn-danger admin-action-btn">
             <LogOut size={16} /> Log Out
           </button>
         </div>
       </header>
 
       {/* Main Dashboard Layout */}
-      <div style={styles.dashboardBody}>
+      <div className="admin-dashboard-body">
         {/* Left Navigation Sidebar */}
         <aside
-          style={{
-            ...styles.sidebar,
-            transform: isSidebarOpen ? 'translateX(0)' : 'translateX(-100%)'
-          }}
-          className="glass-panel no-print"
+          className={`admin-sidebar glass-panel no-print ${isSidebarOpen ? 'open' : ''}`}
         >
-          <nav style={styles.sidebarNav}>
+          <nav className="admin-sidebar-nav">
             {navItems.map(item => {
               const isActive = activeTab === item.id;
               return (
@@ -99,12 +95,7 @@ export default function AdminDashboard({ onBackToCatalog }) {
                     setActiveTab(item.id);
                     setIsSidebarOpen(false); // Close mobile sidebar
                   }}
-                  style={{
-                    ...styles.navBtn,
-                    backgroundColor: isActive ? 'rgba(211, 30, 37, 0.12)' : 'transparent',
-                    borderLeftColor: isActive ? 'var(--color-primary)' : 'transparent',
-                    color: isActive ? '#fff' : 'var(--color-text-secondary)',
-                  }}
+                  className={`admin-nav-btn ${isActive ? 'active' : ''}`}
                 >
                   {item.icon}
                   <span>{item.name}</span>
@@ -115,17 +106,14 @@ export default function AdminDashboard({ onBackToCatalog }) {
         </aside>
 
         {/* Backdrop for mobile sidebar */}
-        {isSidebarOpen && (
-          <div
-            style={styles.sidebarBackdrop}
-            onClick={() => setIsSidebarOpen(false)}
-            className="no-print"
-          />
-        )}
+        <div
+          className={`admin-sidebar-backdrop no-print ${isSidebarOpen ? 'open' : ''}`}
+          onClick={() => setIsSidebarOpen(false)}
+        />
 
         {/* Content Panel */}
-        <main style={styles.contentArea}>
-          <div style={styles.contentCard} className="glass-panel">
+        <main className="admin-content-area">
+          <div className="admin-content-card glass-panel">
             {renderTabContent()}
           </div>
         </main>
@@ -145,161 +133,3 @@ export default function AdminDashboard({ onBackToCatalog }) {
   );
 }
 
-const styles = {
-  dashboardContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100vh',
-    overflow: 'hidden',
-  },
-  topHeader: {
-    margin: '16px',
-    padding: '12px 24px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    zIndex: 100,
-    borderRadius: '12px',
-  },
-  headerLeft: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-  },
-  menuToggle: {
-    background: 'none',
-    border: 'none',
-    color: '#fff',
-    cursor: 'pointer',
-    padding: '4px',
-    marginRight: '4px',
-    display: 'none', // Shown on mobile
-  },
-  logoBadge: {
-    width: '40px',
-    height: '40px',
-    borderRadius: '8px',
-    backgroundColor: 'var(--color-primary)',
-    color: '#fff',
-    fontSize: '1.2rem',
-    fontWeight: '800',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    fontSize: '1.15rem',
-    fontWeight: '700',
-    lineHeight: '1.2',
-  },
-  headerRole: {
-    fontSize: '0.75rem',
-    color: 'var(--color-text-muted)',
-    textTransform: 'uppercase',
-    letterSpacing: '0.05em',
-  },
-  headerActions: {
-    display: 'flex',
-    gap: '8px',
-  },
-  actionBtn: {
-    fontSize: '0.85rem',
-    padding: '8px 16px',
-  },
-  dashboardBody: {
-    flex: 1,
-    display: 'flex',
-    position: 'relative',
-    overflow: 'hidden',
-    padding: '0 16px 16px 16px',
-  },
-  sidebar: {
-    width: '260px',
-    marginRight: '16px',
-    padding: '16px 8px',
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    position: 'relative',
-    zIndex: 90,
-    transition: 'transform var(--transition-normal)',
-  },
-  sidebarNav: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '4px',
-  },
-  navBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    padding: '12px 16px',
-    borderRadius: '8px',
-    border: 'none',
-    borderLeft: '4px solid transparent',
-    backgroundColor: 'transparent',
-    cursor: 'pointer',
-    textAlign: 'left',
-    fontSize: '0.9rem',
-    fontWeight: '500',
-    transition: 'all var(--transition-fast)',
-    width: '100%',
-  },
-  contentArea: {
-    flex: 1,
-    height: '100%',
-    overflowY: 'auto',
-  },
-  contentCard: {
-    padding: '28px',
-    minHeight: '100%',
-    backgroundColor: 'rgba(15, 19, 32, 0.4)',
-  },
-  sidebarBackdrop: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    zIndex: 80,
-  },
-  // Responsive layout overrides
-  '@media (max-width: 991px)': {
-    menuToggle: {
-      display: 'block',
-    },
-    sidebar: {
-      position: 'absolute',
-      left: 0,
-      top: 0,
-      bottom: 0,
-      marginRight: 0,
-      height: '100%',
-      backgroundColor: '#0a0d17',
-    },
-    dashboardBody: {
-      padding: '0 16px 16px 16px',
-    }
-  },
-  '@media (max-width: 576px)': {
-    headerActions: {
-      display: 'none', // We can build fallback icons or hide to save space
-    }
-  }
-};
-
-// Simple media query fallback for React style sheet
-if (typeof window !== 'undefined') {
-  const applyLayout = () => {
-    const isDesktop = window.innerWidth >= 992;
-    styles.sidebar.transform = isDesktop ? 'translateX(0)' : 'translateX(-100%)';
-    styles.menuToggle.display = isDesktop ? 'none' : 'block';
-    
-    // adjust display actions
-    const isMobile = window.innerWidth <= 576;
-    styles.headerActions.display = isMobile ? 'none' : 'flex';
-  };
-  window.addEventListener('resize', applyLayout);
-  applyLayout();
-}

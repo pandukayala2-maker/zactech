@@ -5,6 +5,7 @@ import SubcategoryManager from './SubcategoryManager';
 import ItemManager from './ItemManager';
 import SettingsManager from './SettingsManager';
 import QRGenerator from './QRGenerator';
+import UserManager from './UserManager';
 import { 
   LayoutDashboard, FolderTree, Tag, Settings, QrCode, 
   LogOut, Eye, Menu, X, Bell, ChevronDown, User, 
@@ -172,7 +173,7 @@ export default function AdminDashboard({ onBackToCatalog }) {
       case 'settings':
         return <SettingsManager onNotify={showNotification} />;
       case 'users':
-        return renderUsersTab();
+        return <UserManager onNotify={showNotification} />;
       case 'logs':
         return renderLogsTab();
       default:

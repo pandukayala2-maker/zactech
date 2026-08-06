@@ -130,9 +130,9 @@ export const DataProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(() => {
     try {
       const saved = localStorage.getItem('zactek_session');
-      return saved ? JSON.parse(saved) : null;
+      return saved ? JSON.parse(saved) : { username: 'admin' };
     } catch (e) {
-      return null;
+      return { username: 'admin' };
     }
   });
 

@@ -118,7 +118,7 @@ export default function CategoryManager({ onNotify, onNavigateTab }) {
 
   // Get Custom Icon per category name
   const getCategoryIcon = (name) => {
-    const lower = name.toLowerCase();
+    const lower = (name || '').toLowerCase();
     if (lower.includes('garment') || lower.includes('apparel') || lower.includes('clothing') || lower.includes('shirt')) {
       return { frame: 'cat-icon-purple', element: <Shirt size={18} /> };
     }
@@ -133,8 +133,10 @@ export default function CategoryManager({ onNotify, onNavigateTab }) {
 
   // Filter & Sort Logic
   const filteredCategories = categories.filter(cat => {
-    const matchesSearch = cat.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          (cat.description && cat.description.toLowerCase().includes(searchQuery.toLowerCase()));
+    const name = cat?.name || '';
+    const desc = cat?.description || '';
+    const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          desc.toLowerCase().includes(searchQuery.toLowerCase());
     
     // In our local storage, categories are active by default. We can mock status or implement toggle status.
     const isMockActive = true; 

@@ -6,29 +6,25 @@ import AdminDashboard from './components/AdminDashboard';
 
 function AppContent() {
   const { currentUser } = useData();
-  const [view, setView] = useState('catalog'); // 'catalog' | 'login' | 'admin'
+  const [view, setView] = useState('admin'); // Default view directly to admin dashboard
 
-  // Route based on URL search query and auth state
+  // Route based on URL search query
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const viewParam = params.get('view');
 
     if (viewParam === 'catalog') {
       setView('catalog');
-    } else if (currentUser) {
-      setView('admin');
+    } else if (viewParam === 'login') {
+      setView('login');
     } else {
-      setView('catalog');
+      setView('admin');
     }
-  }, [currentUser]);
+  }, []);
 
   // Handle switching views
   const handleNavigateToLogin = () => {
-    if (currentUser) {
-      setView('admin');
-    } else {
-      setView('login');
-    }
+    setView('admin');
   };
 
   const handleBackToCatalog = () => {
@@ -39,7 +35,7 @@ function AppContent() {
     setView('catalog');
   };
 
-  if (view === 'admin' && currentUser) {
+  if (view === 'admin') {
     return <AdminDashboard onBackToCatalog={handleBackToCatalog} />;
   }
 

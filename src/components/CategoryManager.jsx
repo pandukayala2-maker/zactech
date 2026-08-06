@@ -4,7 +4,7 @@ import {
   FolderPlus, Edit2, Trash2, Save, X, Info, Download, 
   Search, Grid, Plus, ListFilter, ArrowUpDown, ChevronDown, 
   Calendar, Eye, EyeOff, MoreVertical, Shirt, Briefcase, Leaf, 
-  Folder, FolderTree, PlusCircle, ArrowRight, Activity, Zap, Check 
+  Folder, FolderTree, PlusCircle, ArrowRight, Activity, Zap, Check, QrCode 
 } from 'lucide-react';
 
 export default function CategoryManager({ onNotify, onNavigateTab }) {

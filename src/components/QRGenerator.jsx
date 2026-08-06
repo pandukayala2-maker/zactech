@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { useData } from '../context/DataContext';
 import { QRCodeCanvas } from 'qrcode.react';
-import { Printer, Download, Phone, Mail, MapPin, Share2 } from 'lucide-react';
+import { Printer, Download, Phone, Mail, MapPin, Link as LinkIcon, Copy, Info } from 'lucide-react';
 
 export default function QRGenerator({ onNotify }) {
   const { settings } = useData();
@@ -10,9 +10,9 @@ export default function QRGenerator({ onNotify }) {
   // Encode catalog URL
   const getCatalogUrl = () => {
     if (typeof window !== 'undefined') {
-      return `${window.location.origin}?view=catalog`;
+      return `${window.location.origin}/?view=catalog`;
     }
-    return 'https://zactek.com?view=catalog';
+    return 'https://zactek.com/catalog';
   };
 
   const catalogUrl = getCatalogUrl();
@@ -40,6 +40,8 @@ export default function QRGenerator({ onNotify }) {
 
   return (
     <div className="animate-fade-in" style={styles.container}>
+      
+      {/* 1. Header & Top Buttons */}
       <div style={styles.header} className="no-print">
         <div>
           <h2 style={styles.title}>QR Card Generator</h2>
@@ -48,92 +50,126 @@ export default function QRGenerator({ onNotify }) {
           </p>
         </div>
         <div style={styles.btnRow}>
-          <button onClick={handleCopyLink} className="btn btn-secondary">
-            <Share2 size={16} /> Copy URL
+          <button onClick={handleCopyLink} className="btn btn-secondary" style={styles.actionBtn}>
+            <LinkIcon size={16} /> Copy URL
           </button>
-          <button onClick={handleDownloadQR} className="btn btn-secondary">
+          <button onClick={handleDownloadQR} className="btn btn-secondary" style={styles.actionBtn}>
             <Download size={16} /> Download QR Only
           </button>
-          <button onClick={handlePrintCard} className="btn btn-primary">
+          <button onClick={handlePrintCard} className="btn btn-primary" style={styles.actionBtn}>
             <Printer size={16} /> Print Card
           </button>
         </div>
       </div>
 
-      <div style={styles.mainLayout}>
-        {/* Instruction guide */}
+      {/* 2. Main 2-Column Grid Layout */}
+      <div style={styles.mainGrid}>
+        
+        {/* Left Column: Instruction Guide Panel */}
         <div style={styles.guideCard} className="glass-panel no-print">
-          <h3>How to use:</h3>
-          <ol style={styles.list}>
-            <li>Verify manager and phone settings are correct.</li>
-            <li>Press the <strong>Print Card</strong> button.</li>
-            <li>It will open the system print prompt configured to print this premium circular sticker or card.</li>
-            <li>Shop owners scan the QR code using their phones. They are immediately taken to your live garments catalogue to see all products (Polo t-shirts, vests, etc.).</li>
-          </ol>
+          <h3 style={styles.guideTitle}>
+            <span style={styles.infoBadge}>i</span> How to use:
+          </h3>
+          
+          <div style={styles.stepsList}>
+            {/* Step 1 */}
+            <div style={styles.stepItem}>
+              <div style={{ ...styles.stepNum, backgroundColor: '#8b5cf6' }}>1</div>
+              <div style={styles.stepText}>Verify manager and phone settings are correct.</div>
+            </div>
 
-          <div style={styles.infoBox}>
-            <strong>Encoded Link:</strong>
-            <code style={styles.code}>{catalogUrl}</code>
-          </div>
-        </div>
+            {/* Step 2 */}
+            <div style={styles.stepItem}>
+              <div style={{ ...styles.stepNum, backgroundColor: '#3b82f6' }}>2</div>
+              <div style={styles.stepText}>Press the <strong>Print Card</strong> button.</div>
+            </div>
 
-        {/* The Card Rendering (ZacTEK Business Card Style) */}
-        <div style={styles.cardContainer}>
-          <div id="zactek-business-card" ref={cardRef} style={styles.circularCard}>
-            {/* Left curved panel */}
-            <div style={styles.leftHalf}>
-              {/* Profile icon */}
-              <div style={styles.profileCircle}>
-                <div style={styles.userIconBg}>
-                  <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{color: '#fff'}}>
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
-                  </svg>
-                </div>
-              </div>
-
-              {/* Manager info */}
-              <h2 style={styles.cardName}>{settings.managerName}</h2>
-              <div style={styles.cardRole}>{settings.managerRole}</div>
-              <div style={styles.cardLine}></div>
-
-              {/* Contact lists */}
-              <div style={styles.contactItem}>
-                <div style={styles.iconCircle}><Phone size={11} fill="#fff" color="#D31E25" /></div>
-                <div style={styles.contactText}>{settings.phone}</div>
-              </div>
-
-              <div style={styles.contactItem}>
-                <div style={styles.iconCircle}><Mail size={11} fill="#fff" color="#D31E25" /></div>
-                <div style={styles.contactText}>{settings.email}</div>
-              </div>
-
-              <div style={styles.contactItem}>
-                <div style={styles.iconCircle}><MapPin size={11} fill="#fff" color="#D31E25" /></div>
-                <div style={styles.contactTextAddress}>{settings.address}</div>
+            {/* Step 3 */}
+            <div style={styles.stepItem}>
+              <div style={{ ...styles.stepNum, backgroundColor: '#10b981' }}>3</div>
+              <div style={styles.stepText}>
+                It will open the system print prompt configured to print this premium circular sticker or card.
               </div>
             </div>
 
-            {/* Right clean panel */}
-            <div style={styles.rightHalf}>
-              {/* ZacTEK Logo representation */}
-              <div style={styles.logoRow}>
-                <div style={styles.logoIcon}>
-                  <span style={styles.logoC}>C</span>
-                  <span style={styles.logoDots}></span>
-                </div>
-                <div style={styles.logoText}>ZacTEK</div>
+            {/* Step 4 */}
+            <div style={styles.stepItem}>
+              <div style={{ ...styles.stepNum, backgroundColor: '#f97316' }}>4</div>
+              <div style={styles.stepText}>
+                Shop owners scan the QR code using their phones. They are immediately taken to your live garments catalogue to see all products (Polo t-shirts, vests, etc.).
+              </div>
+            </div>
+          </div>
+
+          {/* Encoded Link Box */}
+          <div style={styles.linkBox}>
+            <div style={styles.linkHeader}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#fff', fontSize: '0.85rem', fontWeight: '600' }}>
+                <LinkIcon size={14} /> Encoded Link
+              </div>
+              <button onClick={handleCopyLink} style={styles.copyIconBtn} title="Copy Link">
+                <Copy size={14} />
+              </button>
+            </div>
+            <a href={catalogUrl} target="_blank" rel="noopener noreferrer" style={styles.urlLink}>
+              {catalogUrl}
+            </a>
+          </div>
+        </div>
+
+        {/* Right Column: Premium Circular Business Card Preview */}
+        <div style={styles.cardWrapper}>
+          <div id="zactek-business-card" ref={cardRef} style={styles.circularCard}>
+            
+            {/* Left Curved Dark Panel */}
+            <div style={styles.leftHalf}>
+              {/* Profile Avatar Icon */}
+              <div style={styles.avatarCircle}>
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2.5" fill="none" style={{ color: '#fff' }}>
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
               </div>
 
-              <div style={styles.arabicName}>{settings.companyArabic}</div>
-              <div style={styles.englishName}>{settings.companyName}</div>
+              {/* Manager Info */}
+              <h2 style={styles.cardName}>{settings?.managerName || 'Kumar'}</h2>
+              <div style={styles.cardRole}>{settings?.managerRole || 'Marketing Manager'}</div>
+              <div style={styles.cardDivider}></div>
+
+              {/* Contact Details */}
+              <div style={styles.contactRow}>
+                <div style={styles.contactIconCircle}><Phone size={10} fill="#fff" color="#d31e25" /></div>
+                <span style={styles.contactText}>{settings?.phone || '+965 60607922'}</span>
+              </div>
+
+              <div style={styles.contactRow}>
+                <div style={styles.contactIconCircle}><Mail size={10} fill="#fff" color="#d31e25" /></div>
+                <span style={styles.contactText}>{settings?.email || 'zactekaccouts@gmail.com'}</span>
+              </div>
+
+              <div style={styles.contactRow}>
+                <div style={styles.contactIconCircle}><MapPin size={10} fill="#fff" color="#d31e25" /></div>
+                <span style={styles.addressText}>{settings?.address || 'Abdulla Al-Mubarak Al-Sabah St Sharq, Kuwait City, Kuwait'}</span>
+              </div>
+            </div>
+
+            {/* Right White Panel */}
+            <div style={styles.rightHalf}>
+              {/* Brand Header */}
+              <div style={styles.brandHeader}>
+                <span style={styles.brandLogoSymbol}>C • </span>
+                <span style={styles.brandName}>ZacTEK</span>
+              </div>
+
+              <div style={styles.arabicTitle}>{settings?.companyArabic || 'شركة زاك تيك ذ.م.م'}</div>
+              <div style={styles.englishTitle}>{settings?.companyName || 'ZacTEK Corp W.L.L'}</div>
 
               {/* QR Code Container */}
               <div style={styles.qrFrame}>
                 <QRCodeCanvas
                   id="zactek-qr-canvas"
                   value={catalogUrl}
-                  size={120}
+                  size={135}
                   level={"H"}
                   includeMargin={false}
                   bgColor={"#FFFFFF"}
@@ -141,24 +177,35 @@ export default function QRGenerator({ onNotify }) {
                 />
               </div>
 
-              {/* Partners/Logos section */}
-              <div style={styles.partnerRow}>
-                <span style={styles.partnerM}>M</span>
-                <span style={styles.partnerRedCircle}></span>
-                <span style={styles.partnerSea}>sea shark</span>
+              {/* Social Icons Row */}
+              <div style={styles.socialRow}>
+                {/* Facebook */}
+                <div style={{ ...styles.socialCircle, backgroundColor: '#1877f2' }}>
+                  <span style={styles.socialIconText}>f</span>
+                </div>
+                {/* Instagram */}
+                <div style={{ ...styles.socialCircle, background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)' }}>
+                  <span style={styles.socialIconText}>📷</span>
+                </div>
+                {/* LinkedIn */}
+                <div style={{ ...styles.socialCircle, backgroundColor: '#0a66c2' }}>
+                  <span style={styles.socialIconText}>in</span>
+                </div>
+              </div>
+
+              {/* Bottom Tagline Slogan */}
+              <div style={styles.sloganFooter}>
+                <div style={styles.sloganSmall}>CONNECTING SOLUTIONS</div>
+                <div style={styles.sloganLarge}>DELIVERING <span style={{ color: '#d31e25' }}>TRUST</span></div>
               </div>
             </div>
 
-            {/* Slogan details at bottom */}
-            <div style={styles.footerSlogan}>
-              <div style={styles.sloganSmall}>CONNECTING SOLUTIONS</div>
-              <div style={styles.sloganLarge}>DELIVERING <span style={{color: '#d31e25'}}>TRUST</span></div>
-            </div>
           </div>
         </div>
+
       </div>
-      
-      {/* Print Specific CSS Stylesheet injection */}
+
+      {/* Print stylesheet injection */}
       <style>{`
         @media print {
           body {
@@ -183,14 +230,15 @@ export default function QRGenerator({ onNotify }) {
 const styles = {
   container: {
     paddingBottom: '40px',
+    textAlign: 'left',
   },
   header: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '30px',
+    marginBottom: '24px',
     flexWrap: 'wrap',
-    gap: '12px',
+    gap: '16px',
   },
   title: {
     fontSize: '1.75rem',
@@ -203,127 +251,176 @@ const styles = {
   },
   btnRow: {
     display: 'flex',
-    gap: '8px',
+    gap: '10px',
+    flexWrap: 'wrap',
   },
-  mainLayout: {
+  actionBtn: {
+    fontSize: '0.85rem',
+    padding: '8px 16px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+  },
+  mainGrid: {
     display: 'grid',
-    gridTemplateColumns: '1fr',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
     gap: '30px',
+    alignItems: 'start',
   },
   guideCard: {
     padding: '24px',
-    height: 'fit-content',
   },
-  list: {
-    paddingLeft: '20px',
+  guideTitle: {
+    fontSize: '1.05rem',
+    fontWeight: '600',
     marginBottom: '20px',
-    color: 'var(--color-text-secondary)',
-    fontSize: '0.9rem',
-    lineHeight: '1.8',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
   },
-  infoBox: {
-    backgroundColor: 'rgba(255,255,255,0.02)',
-    padding: '12px',
-    borderRadius: '8px',
-    border: '1px solid var(--color-border)',
-  },
-  code: {
+  infoBadge: {
+    width: '20px',
+    height: '20px',
+    borderRadius: '50%',
+    backgroundColor: '#d31e25',
+    color: '#fff',
     fontSize: '0.75rem',
-    color: 'var(--color-primary-hover)',
+    fontWeight: '700',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontStyle: 'italic',
+  },
+  stepsList: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px',
+    marginBottom: '24px',
+  },
+  stepItem: {
+    display: 'flex',
+    gap: '14px',
+    alignItems: 'flex-start',
+  },
+  stepNum: {
+    width: '24px',
+    height: '24px',
+    borderRadius: '50%',
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: '0.8rem',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+    marginTop: '2px',
+  },
+  stepText: {
+    color: 'var(--color-text-secondary)',
+    fontSize: '0.875rem',
+    lineHeight: '1.5',
+  },
+  linkBox: {
+    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+    border: '1px solid var(--color-border)',
+    borderRadius: '12px',
+    padding: '16px',
+  },
+  linkHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '8px',
+  },
+  copyIconBtn: {
+    background: 'none',
+    border: 'none',
+    color: 'var(--color-text-secondary)',
+    cursor: 'pointer',
+    padding: '4px',
+  },
+  urlLink: {
+    color: '#ff4d54',
+    fontSize: '0.85rem',
+    textDecoration: 'none',
     wordBreak: 'break-all',
   },
-  cardContainer: {
+  cardWrapper: {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: '20px 0',
   },
 
-  /* CIRCULAR CARD DESIGN (based on the user provided business card) */
+  /* Circular Card Container matching mockup */
   circularCard: {
-    width: '480px',
-    height: '480px',
+    width: '500px',
+    height: '500px',
     borderRadius: '50%',
     backgroundColor: '#FFFFFF',
     position: 'relative',
     overflow: 'hidden',
-    boxShadow: '0 20px 50px rgba(0, 0, 0, 0.4)',
+    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.6)',
     display: 'flex',
     fontFamily: "'Inter', sans-serif",
     color: '#000000',
-    border: '10px solid #FFFFFF',
+    border: '6px solid #FFFFFF',
   },
 
-  /* Left Half: Dark / Charcoal arc shape */
+  /* Left Curved Dark Panel */
   leftHalf: {
     flex: '0 0 52%',
-    backgroundColor: '#0F111A',
+    backgroundColor: '#090B12',
     color: '#FFFFFF',
-    padding: '40px 10px 40px 30px',
+    padding: '40px 14px 40px 32px',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'flex-start',
     position: 'relative',
-    borderRight: '12px solid #D31E25',
-    borderTopRightRadius: '240px 480px',
-    borderBottomRightRadius: '240px 480px',
+    borderRight: '14px solid #d31e25',
+    borderTopRightRadius: '250px 500px',
+    borderBottomRightRadius: '250px 500px',
     zIndex: 2,
-    boxShadow: '8px 0 15px rgba(0, 0, 0, 0.2)',
   },
-
-  profileCircle: {
-    width: '50px',
-    height: '50px',
+  avatarCircle: {
+    width: '46px',
+    height: '46px',
     borderRadius: '50%',
-    border: '3px solid #D31E25',
+    backgroundColor: '#d31e25',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: '10px',
-    position: 'relative',
-  },
-  userIconBg: {
-    width: '38px',
-    height: '38px',
-    backgroundColor: '#D31E25',
-    borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   cardName: {
-    fontSize: '2rem',
-    fontWeight: '700',
+    fontSize: '2.1rem',
+    fontWeight: '800',
     color: '#FFFFFF',
-    lineHeight: '1',
+    lineHeight: '1.1',
     margin: '4px 0 2px 0',
-    fontFamily: "'Outfit', sans-serif",
   },
   cardRole: {
     fontSize: '0.85rem',
-    color: '#B0B3BE',
-    fontWeight: '500',
-    textTransform: 'capitalize',
+    color: '#a0aec0',
+    marginBottom: '8px',
   },
-  cardLine: {
-    width: '80px',
-    height: '3px',
-    backgroundColor: '#D31E25',
-    margin: '10px 0 16px 0',
+  cardDivider: {
+    width: '40px',
+    height: '2px',
+    backgroundColor: '#d31e25',
+    marginBottom: '16px',
   },
-  contactItem: {
+  contactRow: {
     display: 'flex',
     alignItems: 'center',
     gap: '8px',
-    marginVertical: '6px',
-    width: '90%',
+    marginBottom: '8px',
   },
-  iconCircle: {
+  contactIconCircle: {
     width: '18px',
     height: '18px',
     borderRadius: '50%',
-    backgroundColor: '#D31E25',
+    backgroundColor: '#d31e25',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -331,146 +428,91 @@ const styles = {
   },
   contactText: {
     fontSize: '0.75rem',
-    color: '#FFFFFF',
-    fontWeight: '600',
-    whiteSpace: 'nowrap',
+    color: '#e2e8f0',
+    fontWeight: '500',
   },
-  contactTextAddress: {
-    fontSize: '0.625rem',
-    color: '#D1D5DB',
+  addressText: {
+    fontSize: '0.65rem',
+    color: '#cbd5e1',
     lineHeight: '1.3',
-    maxHeight: '40px',
-    overflow: 'hidden',
   },
 
-  /* Right Half: Clean White */
+  /* Right White Panel */
   rightHalf: {
-    flex: '1',
+    flex: '0 0 48%',
     backgroundColor: '#FFFFFF',
-    padding: '50px 30px 40px 10px',
+    padding: '30px 20px 30px 10px',
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
     zIndex: 1,
   },
-  logoRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    marginBottom: '8px',
-  },
-  logoIcon: {
-    position: 'relative',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logoC: {
-    fontSize: '1.75rem',
+  brandHeader: {
+    fontSize: '1.4rem',
     fontWeight: '800',
-    color: '#000000',
-    fontFamily: "'Outfit', sans-serif",
+    marginBottom: '2px',
+    color: '#000',
   },
-  logoDots: {
-    width: '8px',
-    height: '8px',
-    borderRadius: '50%',
-    backgroundColor: '#D31E25',
-    display: 'inline-block',
-    marginLeft: '2px',
+  brandLogoSymbol: {
+    color: '#d31e25',
   },
-  logoText: {
-    fontSize: '1.75rem',
-    fontWeight: '800',
-    color: '#D31E25',
-    fontFamily: "'Outfit', sans-serif",
+  brandName: {
+    color: '#d31e25',
   },
-  arabicName: {
-    fontSize: '0.7rem',
+  arabicTitle: {
+    fontSize: '0.75rem',
+    color: '#4a5568',
+    fontWeight: '600',
+  },
+  englishTitle: {
+    fontSize: '0.75rem',
+    color: '#1a202c',
     fontWeight: '700',
-    color: '#333333',
-    textAlign: 'center',
-    fontFamily: 'system-ui, sans-serif',
-  },
-  englishName: {
-    fontSize: '0.85rem',
-    fontWeight: '700',
-    color: '#000000',
-    marginBottom: '16px',
-    textAlign: 'center',
+    marginBottom: '12px',
   },
   qrFrame: {
-    padding: '8px',
-    backgroundColor: '#FFFFFF',
-    border: '2px solid #000000',
-    borderRadius: '8px',
-    boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+    padding: '6px',
+    borderRadius: '12px',
+    border: '2px solid #000',
+    backgroundColor: '#fff',
+    marginBottom: '12px',
     display: 'flex',
+    alignItems: 'center',
     justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: '16px',
   },
-  partnerRow: {
+  socialRow: {
+    display: 'flex',
+    gap: '8px',
+    marginBottom: '12px',
+  },
+  socialCircle: {
+    width: '20px',
+    height: '20px',
+    borderRadius: '50%',
     display: 'flex',
     alignItems: 'center',
-    gap: '10px',
+    justifyContent: 'center',
+    color: '#fff',
   },
-  partnerM: {
-    fontFamily: 'serif',
-    fontWeight: 'bold',
-    fontSize: '0.85rem',
-    color: '#003366',
+  socialIconText: {
+    fontSize: '0.65rem',
+    fontWeight: '700',
+    lineHeight: '1',
   },
-  partnerRedCircle: {
-    width: '10px',
-    height: '10px',
-    borderRadius: '50%',
-    backgroundColor: '#D31E25',
-  },
-  partnerSea: {
-    fontSize: '0.6rem',
-    fontWeight: 'bold',
-    color: '#003366',
-    textTransform: 'lowercase',
-  },
-
-  /* Slogan Center bottom */
-  footerSlogan: {
-    position: 'absolute',
-    bottom: '24px',
-    width: '100%',
-    textAlign: 'center',
-    zIndex: 3,
-    color: '#000000',
+  sloganFooter: {
+    marginTop: '4px',
   },
   sloganSmall: {
     fontSize: '0.55rem',
-    letterSpacing: '2px',
-    color: '#666',
-    fontWeight: '500',
+    fontWeight: '600',
+    letterSpacing: '0.5px',
+    color: '#4a5568',
   },
   sloganLarge: {
-    fontSize: '0.7rem',
-    letterSpacing: '1px',
+    fontSize: '0.75rem',
     fontWeight: '800',
-    marginTop: '2px',
-  },
-
-  // Responsive layout
-  '@media (min-width: 992px)': {
-    mainLayout: {
-      gridTemplateColumns: '320px 1fr',
-    }
+    color: '#000',
   }
 };
-
-// Simple media query fallback for React style sheet
-if (typeof window !== 'undefined') {
-  const applyLayout = () => {
-    const isDesktop = window.innerWidth >= 992;
-    styles.mainLayout.gridTemplateColumns = isDesktop ? '320px 1fr' : '1fr';
-  };
-  window.addEventListener('resize', applyLayout);
-  applyLayout();
-}

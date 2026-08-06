@@ -32,8 +32,9 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
   // Handle WhatsApp Link Generation
   const generateWhatsAppLink = (item, size) => {
     // Format phone: strip non-numeric characters except +
-    const cleanPhone = settings.phone.replace(/[^\d+]/g, '');
-    const message = `Hello ZacTEK Team,\n\nI scanned your QR code card and would like a wholesale price quote for:\n\n*Product:* ${item.name}\n*Brand:* ${item.brand}\n*Selected Size:* ${size || 'Any size'}\n*Category:* ${categories.find(c => c.id === item.categoryId)?.name || ''}\n\nPlease let me know the bulk pricing and availability. Thank you!`;
+    const phone = settings?.phone || '';
+    const cleanPhone = phone.replace(/[^\d+]/g, '');
+    const message = `Hello ZacTEK Team,\n\nI scanned your QR code card and would like a wholesale price quote for:\n\n*Product:* ${item.name}\n*Brand:* ${item.brand}\n*Selected Size:* ${size || 'Any size'}\n*Category:* ${categories?.find(c => c.id === item.categoryId)?.name || ''}\n\nPlease let me know the bulk pricing and availability. Thank you!`;
     
     return `https://wa.me/${cleanPhone.replace('+', '')}?text=${encodeURIComponent(message)}`;
   };
@@ -59,8 +60,8 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
         <div style={styles.headerLogo}>
           <div style={styles.logoBadge}>ZT</div>
           <div>
-            <h1 style={styles.logoTitle}>{settings.companyName}</h1>
-            <p style={styles.logoArabic}>{settings.companyArabic}</p>
+            <h1 style={styles.logoTitle}>{settings?.companyName || ''}</h1>
+            <p style={styles.logoArabic}>{settings?.companyArabic || ''}</p>
           </div>
         </div>
         <button onClick={onNavigateToLogin} style={styles.adminLink} className="btn btn-secondary">
@@ -243,8 +244,8 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
         <div style={styles.footerMain}>
           {/* Card Left Layout */}
           <div style={styles.footerLeft}>
-            <h3 style={styles.footerLogo}>{settings.companyName}</h3>
-            <p style={styles.footerArabic}>{settings.companyArabic}</p>
+            <h3 style={styles.footerLogo}>{settings?.companyName || ''}</h3>
+            <p style={styles.footerArabic}>{settings?.companyArabic || ''}</p>
             <div style={styles.divider}></div>
             
             <div style={styles.agentBox}>
@@ -255,8 +256,8 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
                 </svg>
               </div>
               <div>
-                <strong style={styles.agentName}>{settings.managerName}</strong>
-                <div style={styles.agentRole}>{settings.managerRole}</div>
+                <strong style={styles.agentName}>{settings?.managerName || ''}</strong>
+                <div style={styles.agentRole}>{settings?.managerRole || ''}</div>
               </div>
             </div>
           </div>
@@ -264,17 +265,17 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
           {/* Card Right Layout */}
           <div style={styles.footerRight}>
             <div style={styles.contactDetails}>
-              <a href={`tel:${settings.phone}`} style={styles.contactLink}>
+              <a href={`tel:${settings?.phone || ''}`} style={styles.contactLink}>
                 <div style={styles.contactIconCircle}><Phone size={14} fill="#fff" color="var(--color-primary)" /></div>
-                <span>{settings.phone}</span>
+                <span>{settings?.phone || ''}</span>
               </a>
-              <a href={`mailto:${settings.email}`} style={styles.contactLink}>
+              <a href={`mailto:${settings?.email || ''}`} style={styles.contactLink}>
                 <div style={styles.contactIconCircle}><Mail size={14} fill="#fff" color="var(--color-primary)" /></div>
-                <span style={styles.emailText}>{settings.email}</span>
+                <span style={styles.emailText}>{settings?.email || ''}</span>
               </a>
               <div style={styles.contactLink}>
                 <div style={styles.contactIconCircle}><MapPin size={14} fill="#fff" color="var(--color-primary)" /></div>
-                <span style={styles.addrText}>{settings.address}</span>
+                <span style={styles.addrText}>{settings?.address || ''}</span>
               </div>
             </div>
           </div>

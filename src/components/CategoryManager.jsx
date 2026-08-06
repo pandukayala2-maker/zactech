@@ -408,72 +408,7 @@ export default function CategoryManager({ onNotify, onNavigateTab }) {
         </div>
       </div>
 
-      {/* 6. Widgets Grid Area (Recent Activity & Quick Actions) */}
-      <div className="widgets-grid-container">
-        {/* Recent Activity */}
-        <div className="widget-card glass-panel">
-          <div className="widget-header">
-            <h3 className="widget-title">
-              <Activity size={18} color="var(--color-primary)" /> Recent Activity
-            </h3>
-            <button className="widget-action-link" onClick={() => onNotify('success', 'Viewing complete audit log logs.')}>View All</button>
-          </div>
-          <div className="activity-list">
-            {activities.map(act => (
-              <div key={act.id} className="activity-row">
-                <div className={`activity-icon-badge ${
-                  act.type === 'create' ? 'activity-icon-create' : 
-                  act.type === 'update' ? 'activity-icon-update' : 'activity-icon-delete'
-                }`}>
-                  {act.type === 'create' ? <Plus size={14} /> : 
-                   act.type === 'update' ? <Edit2 size={12} /> : <Trash2 size={12} />}
-                </div>
-                <div className="activity-detail">
-                  <span className="activity-text">{act.text}</span>
-                  <span className="activity-meta">{act.meta}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
 
-        {/* Quick Actions */}
-        <div className="widget-card glass-panel">
-          <div className="widget-header">
-            <h3 className="widget-title">
-              <Zap size={18} color="var(--color-primary)" /> Quick Actions
-            </h3>
-          </div>
-          <div className="quick-actions-flex">
-            {/* Add Category */}
-            <div className="quick-action-square" onClick={handleOpenAddModal}>
-              <div className="quick-action-icon" style={{ backgroundColor: 'rgba(139,92,246,0.1)', color: '#c084fc' }}>
-                <PlusCircle size={20} />
-              </div>
-              <span className="quick-action-title">Add Category</span>
-              <span className="quick-action-desc">Create a new top-level category</span>
-            </div>
-
-            {/* Manage Subcategories */}
-            <div className="quick-action-square" onClick={() => onNavigateTab('subcategories')}>
-              <div className="quick-action-icon" style={{ backgroundColor: 'rgba(16,185,129,0.1)', color: '#34d399' }}>
-                <FolderTree size={20} />
-              </div>
-              <span className="quick-action-title">Manage Subcats</span>
-              <span className="quick-action-desc">Organize subcategories under categories</span>
-            </div>
-
-            {/* Generate QR Card */}
-            <div className="quick-action-square" onClick={() => onNavigateTab('qr')}>
-              <div className="quick-action-icon" style={{ backgroundColor: 'rgba(245,158,11,0.1)', color: '#fbbf24' }}>
-                <QrCode size={20} />
-              </div>
-              <span className="quick-action-title">Generate QR</span>
-              <span className="quick-action-desc">Create QR cards for your categories</span>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* 7. Modal Overlay Form (Add/Edit) */}
       {isModalOpen && (

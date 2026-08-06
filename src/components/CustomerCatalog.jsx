@@ -72,12 +72,12 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
     <div style={styles.container} className="animate-fade-in">
       
       {/* 1. Top Navbar (Matching Laptop Mockup Header) */}
-      <header style={styles.navbar} className="glass-panel">
-        <div style={styles.navLogo}>
-          <div style={styles.logoBadge}>ZT</div>
+      <header style={styles.navbar} className="glass-panel catalog-navbar">
+        <div style={styles.navLogo} className="catalog-nav-logo">
+          <div style={styles.logoBadge} className="catalog-logo-badge">ZT</div>
           <div>
-            <h1 style={styles.logoTitle}>{settings?.companyName || 'ZacTEK Corp W.L.L'}</h1>
-            <p style={styles.logoSubtitle}>Wholesale Catalog Store</p>
+            <h1 style={styles.logoTitle} className="catalog-logo-title">{settings?.companyName || 'ZacTEK Corp W.L.L'}</h1>
+            <p style={styles.logoSubtitle} className="catalog-logo-subtitle">Wholesale Catalog Store</p>
           </div>
         </div>
 
@@ -143,24 +143,24 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
       )}
 
       {/* 2. Hero Showcase Banner (Matching Laptop & Mobile Mockup) */}
-      <section id="hero-section" style={styles.heroSection}>
+      <section id="hero-section" style={styles.heroSection} className="catalog-hero-section">
         <div style={styles.heroLayout}>
           
           {/* Hero Left Content */}
-          <div style={styles.heroContent}>
+          <div style={styles.heroContent} className="catalog-hero-content">
             <div style={styles.pillBadge}>WHOLESALE CATALOG</div>
             
-            <h1 style={styles.heroTitle}>
+            <h1 style={styles.heroTitle} className="catalog-hero-title">
               Premium Garments <br />
               <span style={styles.titleGradient}>&amp; Trading</span>
             </h1>
             
-            <p style={styles.heroSubtitle}>
+            <p style={styles.heroSubtitle} className="catalog-hero-subtitle">
               Browse our wholesale catalog of premium garments, shirts, vests and trading logistics services.
             </p>
 
             {/* Rounded Search Capsule Input */}
-            <div style={styles.searchCapsule}>
+            <div style={styles.searchCapsule} className="catalog-search-capsule">
               <Search size={18} style={styles.searchIcon} />
               <input
                 type="text"
@@ -177,8 +177,8 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
             <div style={styles.stageGlow}></div>
             <div style={styles.stagePedestal}>
               <img 
-                src="/images/polo_tshirt.jpg" 
-                alt="Polo T-Shirt Showcase" 
+                src="/images/hero_3d_stage.jpg" 
+                alt="3D Polo T-Shirt Showcase Stage" 
                 style={styles.heroStageImg}
               />
               <div style={styles.pedestalBadge}>ZT</div>
@@ -189,8 +189,8 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
       </section>
 
       {/* 3. Category Cards Grid (4 Cards Row matching Mockup) */}
-      <section id="categories-section" style={styles.categoriesSection}>
-        <div style={styles.categoriesGrid}>
+      <section id="categories-section" style={styles.categoriesSection} className="catalog-categories-section">
+        <div style={styles.categoriesGrid} className="catalog-categories-grid">
           
           {/* Card 1: All Categories */}
           <button
@@ -201,13 +201,13 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
               boxShadow: selectedCatId === 'all' ? '0 0 20px rgba(211,30,37,0.3)' : 'none',
               background: selectedCatId === 'all' ? 'rgba(211, 30, 37, 0.12)' : 'rgba(15, 20, 32, 0.7)'
             }}
-            className="glass-panel"
+            className="glass-panel catalog-cat-card"
           >
-            <div style={{ ...styles.catIconCircle, backgroundColor: 'rgba(211, 30, 37, 0.15)', color: '#ef4444' }}>
+            <div style={{ ...styles.catIconCircle, backgroundColor: 'rgba(211, 30, 37, 0.15)', color: '#ef4444' }} className="catalog-cat-icon">
               <Grid size={22} />
             </div>
-            <strong style={styles.catTitle}>All Categories</strong>
-            <span style={styles.catSubtext}>View all</span>
+            <strong style={styles.catTitle} className="catalog-cat-title">All Categories</strong>
+            <span style={styles.catSubtext} className="catalog-cat-subtext">View all</span>
           </button>
 
           {/* Card 2: Apparel & Garments */}
@@ -219,13 +219,13 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
               boxShadow: selectedCatId === (categories[0]?.id || 'cat-1') ? '0 0 20px rgba(211,30,37,0.3)' : 'none',
               background: selectedCatId === (categories[0]?.id || 'cat-1') ? 'rgba(211, 30, 37, 0.12)' : 'rgba(15, 20, 32, 0.7)'
             }}
-            className="glass-panel"
+            className="glass-panel catalog-cat-card"
           >
-            <div style={{ ...styles.catIconCircle, backgroundColor: 'rgba(34, 197, 94, 0.15)', color: '#22c55e' }}>
+            <div style={{ ...styles.catIconCircle, backgroundColor: 'rgba(34, 197, 94, 0.15)', color: '#22c55e' }} className="catalog-cat-icon">
               <Shirt size={22} />
             </div>
-            <strong style={styles.catTitle}>Apparel &amp; Garments</strong>
-            <span style={styles.catSubtext}>Clothing</span>
+            <strong style={styles.catTitle} className="catalog-cat-title">Apparel &amp; Garments</strong>
+            <span style={styles.catSubtext} className="catalog-cat-subtext">Clothing</span>
           </button>
 
           {/* Card 3: Corporate Services */}
@@ -237,13 +237,13 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
               boxShadow: selectedCatId === (categories[1]?.id || 'cat-2') ? '0 0 20px rgba(211,30,37,0.3)' : 'none',
               background: selectedCatId === (categories[1]?.id || 'cat-2') ? 'rgba(211, 30, 37, 0.12)' : 'rgba(15, 20, 32, 0.7)'
             }}
-            className="glass-panel"
+            className="glass-panel catalog-cat-card"
           >
-            <div style={{ ...styles.catIconCircle, backgroundColor: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b' }}>
+            <div style={{ ...styles.catIconCircle, backgroundColor: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b' }} className="catalog-cat-icon">
               <Package size={22} />
             </div>
-            <strong style={styles.catTitle}>Corporate Services</strong>
-            <span style={styles.catSubtext}>Services</span>
+            <strong style={styles.catTitle} className="catalog-cat-title">Corporate Services</strong>
+            <span style={styles.catSubtext} className="catalog-cat-subtext">Services</span>
           </button>
 
           {/* Card 4: Environmental Services */}
@@ -255,13 +255,13 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
               boxShadow: selectedCatId === (categories[2]?.id || 'cat-3') ? '0 0 20px rgba(211,30,37,0.3)' : 'none',
               background: selectedCatId === (categories[2]?.id || 'cat-3') ? 'rgba(211, 30, 37, 0.12)' : 'rgba(15, 20, 32, 0.7)'
             }}
-            className="glass-panel"
+            className="glass-panel catalog-cat-card"
           >
-            <div style={{ ...styles.catIconCircle, backgroundColor: 'rgba(16, 185, 129, 0.15)', color: '#10b981' }}>
+            <div style={{ ...styles.catIconCircle, backgroundColor: 'rgba(16, 185, 129, 0.15)', color: '#10b981' }} className="catalog-cat-icon">
               <Leaf size={22} />
             </div>
-            <strong style={styles.catTitle}>Environmental Services</strong>
-            <span style={styles.catSubtext}>Eco Solutions</span>
+            <strong style={styles.catTitle} className="catalog-cat-title">Environmental Services</strong>
+            <span style={styles.catSubtext} className="catalog-cat-subtext">Eco Solutions</span>
           </button>
 
         </div>
@@ -302,7 +302,7 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
       )}
 
       {/* 4. Featured Products Showcase Section */}
-      <section id="products-section" style={styles.productsSection}>
+      <section id="products-section" style={styles.productsSection} className="catalog-products-section">
         <div style={styles.sectionHeader}>
           <h2 style={styles.sectionTitle}>Featured Products</h2>
           <button 
@@ -320,7 +320,7 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
             <p>Try searching for a different keyword or reset category filters.</p>
           </div>
         ) : (
-          <div style={styles.productGrid}>
+          <div style={styles.productGrid} className="catalog-product-grid">
             {filteredItems.map((item, idx) => {
               const sizesList = item.sizes || ["M", "L", "XL", "XXL"];
               const categoryNameTag = item.subcategoryId === 'subcat-1' ? 'POLO T-SHIRTS' : 
@@ -330,10 +330,10 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
                 <div
                   key={item.id}
                   style={styles.productCardHorizontal}
-                  className="glass-panel product-hover-card"
+                  className="glass-panel product-hover-card catalog-product-card"
                 >
                   {/* Card Left: Large Image Preview */}
-                  <div style={styles.cardImageContainer}>
+                  <div style={styles.cardImageContainer} className="catalog-card-image-container">
                     <img
                       src={item.imageUrl}
                       alt={item.name}
@@ -346,7 +346,7 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
                   </div>
 
                   {/* Card Right: Details */}
-                  <div style={styles.cardBody}>
+                  <div style={styles.cardBody} className="catalog-card-body">
                     <h3 style={styles.cardTitle}>{item.name}</h3>
 
                     {/* Sizing Tags Row */}
@@ -378,8 +378,8 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
       </section>
 
       {/* 5. Footer Business Card & 3D Globe Delivery Graphic (Matching Laptop Mockup Footer) */}
-      <footer id="footer-section" style={styles.footer} className="glass-panel">
-        <div style={styles.footerGrid}>
+      <footer id="footer-section" style={styles.footer} className="glass-panel catalog-footer">
+        <div style={styles.footerGrid} className="catalog-footer-grid">
           
           {/* Left Column: Company & Profile info */}
           <div style={styles.footerLeft}>
@@ -426,10 +426,14 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
           </div>
 
           {/* Right Column: 3D Logistics Globe Illustration */}
-          <div style={styles.footerRight} className="desktop-only">
+          <div style={styles.footerRight}>
             <div style={styles.globeGraphicBox}>
               <div style={styles.globeGlow}></div>
-              <Globe size={90} color="#d31e25" style={{ opacity: 0.8 }} />
+              <img 
+                src="/images/footer_3d_globe.jpg" 
+                alt="3D Logistics Globe" 
+                style={{ width: '130px', height: '130px', borderRadius: '16px', objectFit: 'cover', border: '1px solid rgba(211,30,37,0.4)', boxShadow: '0 8px 20px rgba(0,0,0,0.5)' }} 
+              />
               <div style={styles.deliveryBadge}>
                 🚚 Logistics &amp; Shipping Active
               </div>

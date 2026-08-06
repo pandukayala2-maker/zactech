@@ -1011,4 +1011,118 @@ button, input, textarea, select {
   line-height: 1.3;
 }
 
+/* Responsive Mobile Catalog Styles */
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
+  .desktop-nav-links {
+    display: none !important;
+  }
+  .mobile-nav-toggle {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Mobile Catalog Header */
+  .catalog-navbar {
+    padding: 12px 16px !important;
+  }
+  .catalog-nav-logo {
+    gap: 8px !important;
+  }
+  .catalog-logo-badge {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 0.85rem !important;
+  }
+  .catalog-logo-title {
+    font-size: 0.95rem !important;
+  }
+  .catalog-logo-subtitle {
+    font-size: 0.65rem !important;
+  }
+
+  /* Mobile Hero */
+  .catalog-hero-section {
+    padding: 30px 16px 20px 16px !important;
+  }
+  .catalog-hero-content {
+    text-align: center !important;
+    margin: 0 auto !important;
+  }
+  .catalog-hero-title {
+    font-size: 1.9rem !important;
+  }
+  .catalog-hero-subtitle {
+    font-size: 0.85rem !important;
+    margin-bottom: 20px !important;
+  }
+  .catalog-search-capsule {
+    max-width: 100% !important;
+    margin: 0 auto !important;
+  }
+
+  /* Mobile Categories Grid - EXACT 2x2 GRID */
+  .catalog-categories-section {
+    padding: 0 16px 30px 16px !important;
+  }
+  .catalog-categories-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+  .catalog-cat-card {
+    padding: 14px 10px !important;
+    align-items: center !important;
+    text-align: center !important;
+    border-radius: 14px !important;
+  }
+  .catalog-cat-icon {
+    width: 38px !important;
+    height: 38px !important;
+    margin-bottom: 8px !important;
+  }
+  .catalog-cat-title {
+    font-size: 0.82rem !important;
+    line-height: 1.2 !important;
+  }
+  .catalog-cat-subtext {
+    font-size: 0.7rem !important;
+  }
+
+  /* Mobile Featured Products */
+  .catalog-products-section {
+    padding: 0 16px 40px 16px !important;
+  }
+  .catalog-product-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  .catalog-product-card {
+    flex-direction: column !important;
+  }
+  .catalog-card-image-container {
+    width: 100% !important;
+    height: 180px !important;
+    min-height: 180px !important;
+  }
+  .catalog-card-body {
+    width: 100% !important;
+    padding: 16px !important;
+  }
+
+  /* Mobile Footer */
+  .catalog-footer {
+    margin: 20px 16px 0 16px !important;
+    padding: 24px 16px 16px 16px !important;
+  }
+  .catalog-footer-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+}
+
+
 

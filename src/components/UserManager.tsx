@@ -1,8 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, FormEvent } from 'react';
 import { useData } from '../context/DataContext';
-import { Shield, UserPlus, Edit2, Trash2, User, X, Check } from 'lucide-react';
+import { Shield, UserPlus, Edit2, Trash2, User as UserIcon, X, Check } from 'lucide-react';
+import { User } from '../types';
 
-const INITIAL_USERS = [
+interface UserManagerProps {
+  onNotify: (type: 'success' | 'error' | 'info', message: string) => void;
+}
+
+const INITIAL_USERS: User[] = [
   {
     id: 'user-1',
     name: 'Kumar (You)',
@@ -23,11 +28,11 @@ const INITIAL_USERS = [
   }
 ];
 
-export default function UserManager({ onNotify }) {
+export default function UserManager({ onNotify }: UserManagerProps) {
   const { settings } = useData();
 
   // Users State with LocalStorage sync
-  const [users, setUsers] = useState(() => {
+  const [users, setUsers] = useState<User[]>(() => {
     try {
       const saved = localStorage.getItem('zactek_users');
       return saved ? JSON.parse(saved) : INITIAL_USERS;
@@ -42,11 +47,11 @@ export default function UserManager({ onNotify }) {
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editId, setEditId] = useState(null);
+  const [editId, setEditId] = useState<string | null>(null);
   const [fullName, setFullName] = useState('');
   const [username, setUsername] = useState('');
   const [designation, setDesignation] = useState('');
-  const [role, setRole] = useState('Editor');
+  const [role, setRole] = useState<'Administrator' | 'Editor' | 'Viewer'>('Editor');
   const [password, setPassword] = useState('');
 
   const handleOpenAddModal = () => {
@@ -59,7 +64,7 @@ export default function UserManager({ onNotify }) {
     setIsModalOpen(true);
   };
 
-  const handleOpenEditModal = (user) => {
+  const handleOpenEditModal = (user: User) => {
     setEditId(user.id);
     setFullName(user.name.replace(' (You)', ''));
     setUsername(user.username);
@@ -69,7 +74,7 @@ export default function UserManager({ onNotify }) {
     setIsModalOpen(true);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!fullName.trim() || !username.trim() || !designation.trim()) {
       onNotify('error', 'Please fill in all required fields.');
@@ -93,7 +98,7 @@ export default function UserManager({ onNotify }) {
       const colors = ['#8b5cf6', '#10b981', '#f59e0b', '#ec4899', '#06b6d4'];
       const randomColor = colors[Math.floor(Math.random() * colors.length)];
 
-      const newUser = {
+      const newUser: User = {
         id: `user-${Date.now()}`,
         name: fullName.trim(),
         username: username.trim().toLowerCase(),
@@ -110,7 +115,7 @@ export default function UserManager({ onNotify }) {
     setIsModalOpen(false);
   };
 
-  const handleDeleteUser = (user) => {
+  const handleDeleteUser = (user: User) => {
     if (user.id === 'user-1' || user.username === 'admin') {
       onNotify('error', 'Primary Administrator account cannot be deleted.');
       return;
@@ -161,7 +166,6 @@ export default function UserManager({ onNotify }) {
             <tbody>
               {users.map(u => (
                 <tr key={u.id}>
-                  {/* AVATAR */}
                   <td>
                     <div className="user-avatar-circle" style={{ 
                       width: '32px', 
@@ -179,61 +183,58 @@ export default function UserManager({ onNotify }) {
                     </div>
                   </td>
 
-                  {/* NAME */}
                   <td>
                     <strong style={{ color: '#fff', fontSize: '0.95rem' }}>{u.name}</strong>
                   </td>
 
-                  {/* USERNAME */}
                   <td>
                     <code>{u.username}</code>
                   </td>
 
-                  {/* DESIGNATION */}
                   <td>
                     <span style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>
                       {u.designation}
                     </span>
                   </td>
 
-                  {/* ROLE */}
                   <td>
-                    {u.role === 'Administrator' ? (
-                      <span className="badge badge-primary">Administrator</span>
-                    ) : (
-                      <span className="badge" style={{ backgroundColor: 'rgba(59,130,246,0.12)', color: '#60a5fa', border: '1px solid rgba(59,130,246,0.2)' }}>
-                        {u.role}
-                      </span>
-                    )}
-                  </td>
-
-                  {/* STATUS */}
-                  <td>
-                    <span className="status-badge active" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10b981', display: 'inline-block' }}></span>
-                      {u.status}
+                    <span style={{
+                      padding: '4px 10px',
+                      borderRadius: '20px',
+                      fontSize: '0.75rem',
+                      fontWeight: '600',
+                      backgroundColor: u.role === 'Administrator' ? 'rgba(211, 30, 37, 0.15)' : 
+                                       u.role === 'Editor' ? 'rgba(59, 130, 246, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                      color: u.role === 'Administrator' ? '#f87171' : 
+                             u.role === 'Editor' ? '#60a5fa' : 'var(--color-text-secondary)',
+                      border: `1px solid ${u.role === 'Administrator' ? 'rgba(211, 30, 37, 0.3)' : 
+                                          u.role === 'Editor' ? 'rgba(59, 130, 246, 0.3)' : 'var(--color-border)'}`
+                    }}>
+                      {u.role}
                     </span>
                   </td>
 
-                  {/* ACTIONS */}
                   <td>
-                    <div style={styles.actionButtons}>
-                      <button
+                    <span className="status-badge active">
+                      &bull; Active
+                    </span>
+                  </td>
+
+                  <td style={{ textAlign: 'right' }}>
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                      <button 
                         onClick={() => handleOpenEditModal(u)}
-                        className="btn btn-secondary"
-                        style={styles.actionBtnIcon}
+                        style={styles.actionIconBtn} 
                         title="Edit User"
                       >
-                        <Edit2 size={15} />
+                        <Edit2 size={14} />
                       </button>
-                      <button
+                      <button 
                         onClick={() => handleDeleteUser(u)}
-                        className="btn btn-danger"
-                        style={styles.actionBtnIcon}
+                        style={{ ...styles.actionIconBtn, color: '#f87171' }} 
                         title="Delete User"
-                        disabled={u.id === 'user-1' || u.username === 'admin'}
                       >
-                        <Trash2 size={15} />
+                        <Trash2 size={14} />
                       </button>
                     </div>
                   </td>
@@ -244,68 +245,50 @@ export default function UserManager({ onNotify }) {
         </div>
       </div>
 
-      {/* Add / Edit User Modal Overlay */}
+      {/* Add / Edit User Modal */}
       {isModalOpen && (
-        <div style={styles.overlay}>
-          <div style={styles.formModal} className="glass-panel animate-fade-in">
+        <div style={styles.modalOverlay} onClick={() => setIsModalOpen(false)}>
+          <div style={styles.modalContent} onClick={(e) => e.stopPropagation()} className="glass-panel animate-fade-in">
             <div style={styles.modalHeader}>
-              <h3 style={{ margin: 0 }}>{editId ? 'Edit User Profile' : 'Add New User'}</h3>
-              <button onClick={() => setIsModalOpen(false)} style={styles.closeBtn}>
-                <X size={20} />
+              <h3 style={styles.modalTitle}>
+                <UserIcon size={18} color="var(--color-primary)" /> {editId ? 'Edit User Details' : 'Add New System User'}
+              </h3>
+              <button style={styles.modalCloseBtn} onClick={() => setIsModalOpen(false)}>
+                <X size={18} />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} style={styles.scrollForm}>
+            <form onSubmit={handleSubmit} style={styles.modalForm}>
               <div className="form-group">
-                <label htmlFor="userFullName">Full Name *</label>
+                <label>Full Name *</label>
                 <input
-                  id="userFullName"
                   type="text"
                   className="form-control"
-                  placeholder="e.g. Sales Representative"
+                  placeholder="e.g. Rahul Sharma"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required
                 />
               </div>
 
-              <div style={styles.grid2}>
-                <div className="form-group">
-                  <label htmlFor="userUsername">Username *</label>
-                  <input
-                    id="userUsername"
-                    type="text"
-                    className="form-control"
-                    placeholder="e.g. sales_rep1"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="userRole">Role *</label>
-                  <select
-                    id="userRole"
-                    className="form-control"
-                    value={role}
-                    onChange={(e) => setRole(e.target.value)}
-                    required
-                  >
-                    <option value="Administrator">Administrator</option>
-                    <option value="Editor">Editor</option>
-                    <option value="Viewer">Viewer</option>
-                  </select>
-                </div>
+              <div className="form-group">
+                <label>Username *</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="e.g. rahul_sales"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                />
               </div>
 
               <div className="form-group">
-                <label htmlFor="userDesignation">Designation / Title *</label>
+                <label>Designation / Title *</label>
                 <input
-                  id="userDesignation"
                   type="text"
                   className="form-control"
-                  placeholder="e.g. Wholesale Agent"
+                  placeholder="e.g. Wholesale Executive"
                   value={designation}
                   onChange={(e) => setDesignation(e.target.value)}
                   required
@@ -313,24 +296,36 @@ export default function UserManager({ onNotify }) {
               </div>
 
               <div className="form-group">
-                <label htmlFor="userPassword">Password {editId ? '(Leave blank to keep unchanged)' : '*'}</label>
+                <label>Role Assignment *</label>
+                <select
+                  className="form-control"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value as any)}
+                >
+                  <option value="Administrator">Administrator (Full Access)</option>
+                  <option value="Editor">Editor (Add/Edit Products & Categories)</option>
+                  <option value="Viewer">Viewer (Read-only)</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Password {!editId && '*'}</label>
                 <input
-                  id="userPassword"
                   type="password"
                   className="form-control"
-                  placeholder="••••••••"
+                  placeholder={editId ? 'Leave blank to keep unchanged' : 'Enter password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required={!editId}
                 />
               </div>
 
-              <div style={styles.modalActions}>
-                <button type="button" onClick={() => setIsModalOpen(false)} className="btn btn-secondary">
+              <div style={styles.modalFooter}>
+                <button type="button" className="btn btn-secondary" onClick={() => setIsModalOpen(false)}>
                   Cancel
                 </button>
                 <button type="submit" className="btn btn-primary">
-                  {editId ? 'Save Changes' : 'Create User'}
+                  <Check size={16} /> {editId ? 'Update User' : 'Create Account'}
                 </button>
               </div>
             </form>
@@ -342,7 +337,7 @@ export default function UserManager({ onNotify }) {
   );
 }
 
-const styles = {
+const styles: Record<string, React.CSSProperties> = {
   headerRow: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -361,11 +356,8 @@ const styles = {
     marginTop: '4px',
   },
   headerBtn: {
-    fontSize: '0.85rem',
-    padding: '8px 16px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
+    padding: '10px 18px',
+    fontSize: '0.9rem',
   },
   tableTitle: {
     fontSize: '1.1rem',
@@ -375,71 +367,66 @@ const styles = {
     alignItems: 'center',
     gap: '8px',
   },
-  actionButtons: {
-    display: 'flex',
-    gap: '6px',
-    justifyContent: 'flex-end',
+  actionIconBtn: {
+    background: 'rgba(255,255,255,0.03)',
+    border: '1px solid var(--color-border)',
+    color: 'var(--color-text-secondary)',
+    padding: '6px',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  actionBtnIcon: {
-    padding: '6px 8px',
-    minHeight: 'auto',
-    backgroundColor: 'rgba(255,255,255,0.02)',
-    borderColor: 'var(--color-border)'
-  },
-  overlay: {
+  modalOverlay: {
     position: 'fixed',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
     zIndex: 1000,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     padding: '20px',
   },
-  formModal: {
+  modalContent: {
     width: '100%',
-    maxWidth: '520px',
-    display: 'flex',
-    flexDirection: 'column',
-    backgroundColor: '#0a0d14',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-    overflow: 'hidden',
+    maxWidth: '500px',
+    backgroundColor: '#0c0f1b',
     borderRadius: '16px',
+    border: '1px solid var(--color-border)',
+    padding: '24px',
   },
   modalHeader: {
-    padding: '16px 24px',
-    borderBottom: '1px solid var(--color-border)',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: '20px',
   },
-  closeBtn: {
-    background: 'none',
-    border: 'none',
-    color: 'var(--color-text-secondary)',
-    cursor: 'pointer',
-    padding: '4px',
-    borderRadius: '4px',
+  modalTitle: {
+    fontSize: '1.2rem',
+    fontWeight: '600',
     display: 'flex',
     alignItems: 'center',
+    gap: '8px',
   },
-  scrollForm: {
-    padding: '24px',
+  modalCloseBtn: {
+    background: 'none',
+    border: 'none',
+    color: 'var(--color-text-muted)',
+    cursor: 'pointer',
   },
-  grid2: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+  modalForm: {
+    display: 'flex',
+    flexDirection: 'column',
     gap: '16px',
   },
-  modalActions: {
+  modalFooter: {
     display: 'flex',
     justifyContent: 'flex-end',
     gap: '12px',
-    marginTop: '20px',
-    borderTop: '1px solid var(--color-border)',
-    paddingTop: '16px',
+    marginTop: '10px',
   }
 };

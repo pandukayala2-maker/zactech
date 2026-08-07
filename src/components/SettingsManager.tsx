@@ -1,24 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, FormEvent } from 'react';
 import { useData } from '../context/DataContext';
 import { Settings, Save, ShieldAlert, KeyRound } from 'lucide-react';
 
-export default function SettingsManager({ onNotify }) {
+interface SettingsManagerProps {
+  onNotify: (type: 'success' | 'error' | 'info', message: string) => void;
+}
+
+export default function SettingsManager({ onNotify }: SettingsManagerProps) {
   const { settings, setSettings } = useData();
 
   // Settings State
-  const [companyName, setCompanyName] = useState(settings.companyName);
-  const [companyArabic, setCompanyArabic] = useState(settings.companyArabic);
-  const [managerName, setManagerName] = useState(settings.managerName);
-  const [managerRole, setManagerRole] = useState(settings.managerRole);
-  const [phone, setPhone] = useState(settings.phone);
-  const [email, setEmail] = useState(settings.email);
-  const [address, setAddress] = useState(settings.address);
+  const [companyName, setCompanyName] = useState(settings.companyName || '');
+  const [companyArabic, setCompanyArabic] = useState(settings.companyArabic || '');
+  const [managerName, setManagerName] = useState(settings.managerName || '');
+  const [managerRole, setManagerRole] = useState(settings.managerRole || '');
+  const [phone, setPhone] = useState(settings.phone || '');
+  const [email, setEmail] = useState(settings.email || '');
+  const [address, setAddress] = useState(settings.address || '');
   
   // Security Credentials State
-  const [adminUsername, setAdminUsername] = useState(settings.adminUsername);
-  const [adminPassword, setAdminPassword] = useState(settings.adminPassword);
+  const [adminUsername, setAdminUsername] = useState((settings as any).adminUsername || 'admin');
+  const [adminPassword, setAdminPassword] = useState((settings as any).adminPassword || 'admin123');
 
-  const handleSaveProfile = (e) => {
+  const handleSaveProfile = (e: FormEvent) => {
     e.preventDefault();
     if (!companyName.trim() || !phone.trim() || !email.trim()) {
       onNotify('error', 'Please fill in the required fields (Company Name, Phone, Email).');
@@ -36,7 +40,7 @@ export default function SettingsManager({ onNotify }) {
       address,
       adminUsername,
       adminPassword
-    });
+    } as any);
 
     onNotify('success', 'Profile and contact settings saved!');
   };
@@ -131,7 +135,7 @@ export default function SettingsManager({ onNotify }) {
             <label htmlFor="setAddr">Office Address / Showroom location</label>
             <textarea
               id="setAddr"
-              rows="3"
+              rows={3}
               className="form-control"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
@@ -179,7 +183,6 @@ export default function SettingsManager({ onNotify }) {
             </div>
           </div>
 
-          {/* Action button */}
           <button type="submit" className="btn btn-primary" style={styles.saveBtn}>
             <Save size={18} /> Save Settings
           </button>
@@ -189,7 +192,7 @@ export default function SettingsManager({ onNotify }) {
   );
 }
 
-const styles = {
+const styles: Record<string, React.CSSProperties> = {
   container: {
     maxWidth: '1000px',
     margin: '0 auto',
@@ -208,7 +211,7 @@ const styles = {
   },
   layout: {
     display: 'grid',
-    gridTemplateColumns: '1fr',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
     gap: '24px',
   },
   panel: {
@@ -246,21 +249,5 @@ const styles = {
     width: '100%',
     padding: '14px',
     fontSize: '1rem',
-  },
-  // Responsive layout addition
-  '@media (min-width: 992px)': {
-    layout: {
-      gridTemplateColumns: '1fr 320px',
-    }
   }
 };
-
-// Simple media query fallback for React style sheet
-if (typeof window !== 'undefined') {
-  const applyLayout = () => {
-    const isDesktop = window.innerWidth >= 992;
-    styles.layout.gridTemplateColumns = isDesktop ? '1fr 320px' : '1fr';
-  };
-  window.addEventListener('resize', applyLayout);
-  applyLayout();
-}

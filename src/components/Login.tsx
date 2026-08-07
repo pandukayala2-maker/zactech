@@ -1,20 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, FormEvent } from 'react';
 import { useData } from '../context/DataContext';
 import { Lock, User, LogIn, ArrowLeft } from 'lucide-react';
 
-export default function Login({ onBackToCatalog }) {
+interface LoginProps {
+  onBackToCatalog: () => void;
+}
+
+export default function Login({ onBackToCatalog }: LoginProps) {
   const { login, settings } = useData();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     setError('');
 
     const success = login(username, password);
     if (success) {
-      // App.jsx will automatically see the session update and route to Admin
+      // App will update view automatically
     } else {
       setError('Invalid username or password. Please try again.');
     }
@@ -83,7 +87,7 @@ export default function Login({ onBackToCatalog }) {
   );
 }
 
-const styles = {
+const styles: Record<string, React.CSSProperties> = {
   container: {
     minHeight: '100vh',
     display: 'flex',

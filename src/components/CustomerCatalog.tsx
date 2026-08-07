@@ -1,26 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { useData } from '../context/DataContext';
 import { 
-  Search, ShoppingBag, Phone, Mail, MapPin, Send, ArrowRight, 
+  Search, ShoppingBag, Phone, Mail, MapPin, Send, 
   UserCheck, X, Check, Menu, Grid, Shirt, Package, Leaf, Globe 
 } from 'lucide-react';
+import { Item, Subcategory } from '../types';
 
-export default function CustomerCatalog({ onNavigateToLogin }) {
+interface CustomerCatalogProps {
+  onNavigateToLogin: () => void;
+}
+
+export default function CustomerCatalog({ onNavigateToLogin }: CustomerCatalogProps) {
   const { categories, subcategories, items, settings } = useData();
 
   // Navigation & Filter State
-  const [activeNav, setActiveNav] = useState('home'); // 'home' | 'categories' | 'products' | 'about' | 'contact'
+  const [activeNav, setActiveNav] = useState<'home' | 'categories' | 'products' | 'about' | 'contact'>('home');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCatId, setSelectedCatId] = useState('all');
   const [selectedSubcatId, setSelectedSubcatId] = useState('all');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Modal State
-  const [activeItem, setActiveItem] = useState(null);
+  const [activeItem, setActiveItem] = useState<Item | null>(null);
   const [inquirySize, setInquirySize] = useState('');
 
   // Subcategories List for filter
-  const [subcatList, setSubcatList] = useState([]);
+  const [subcatList, setSubcatList] = useState<Subcategory[]>([]);
 
   // Load subcategories when category changes
   useEffect(() => {
@@ -35,7 +40,7 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
   }, [selectedCatId, subcategories]);
 
   // WhatsApp Link Generation
-  const generateWhatsAppLink = (item, size) => {
+  const generateWhatsAppLink = (item: Item, size: string) => {
     const phone = settings?.phone || '+965 60607922';
     const cleanPhone = phone.replace(/[^\d+]/g, '');
     const message = `Hello ZacTEK Team,\n\nI scanned your QR code card and would like a wholesale price quote for:\n\n*Product:* ${item.name}\n*Brand:* ${item.brand || 'ONN Premiums'}\n*Selected Size:* ${size || 'Any size'}\n*Category:* ${categories?.find(c => c.id === item.categoryId)?.name || ''}\n\nPlease let me know the bulk pricing and availability. Thank you!`;
@@ -59,9 +64,9 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
     return matchesSearch && matchesCategory && matchesSubcategory;
   });
 
-  const getSubcategoryName = (id) => subcategories.find(sc => sc.id === id)?.name || 'Garments';
+  const getSubcategoryName = (id: string) => subcategories.find(sc => sc.id === id)?.name || 'Garments';
 
-  const scrollToSection = (sectionId) => {
+  const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
@@ -71,7 +76,7 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
   return (
     <div style={styles.container} className="animate-fade-in">
       
-      {/* 1. Top Navbar (Matching Laptop Mockup Header) */}
+      {/* 1. Top Navbar Header */}
       <header style={styles.navbar} className="glass-panel catalog-navbar">
         <div style={styles.navLogo} className="catalog-nav-logo">
           <div style={styles.logoBadge} className="catalog-logo-badge">ZT</div>
@@ -142,7 +147,7 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
         </div>
       )}
 
-      {/* 2. Hero Showcase Banner (Matching Laptop & Mobile Mockup) */}
+      {/* 2. Hero Showcase Banner */}
       <section id="hero-section" style={styles.heroSection} className="catalog-hero-section">
         <div style={styles.heroLayout}>
           
@@ -188,7 +193,7 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
         </div>
       </section>
 
-      {/* 3. Category Cards Grid (4 Cards Row matching Mockup) */}
+      {/* 3. Category Cards Grid */}
       <section id="categories-section" style={styles.categoriesSection} className="catalog-categories-section">
         <div style={styles.categoriesGrid} className="catalog-categories-grid">
           
@@ -321,7 +326,7 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
           </div>
         ) : (
           <div style={styles.productGrid} className="catalog-product-grid">
-            {filteredItems.map((item, idx) => {
+            {filteredItems.map((item) => {
               const sizesList = item.sizes || ["M", "L", "XL", "XXL"];
               const categoryNameTag = item.subcategoryId === 'subcat-1' ? 'POLO T-SHIRTS' : 
                                       item.subcategoryId === 'subcat-2' ? "MEN'S VESTS" : 'GARMENTS';
@@ -338,7 +343,7 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
                       src={item.imageUrl}
                       alt={item.name}
                       style={styles.cardImage}
-                      onError={(e) => {
+                      onError={(e: any) => {
                         e.target.src = 'https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=500&auto=format&fit=crop&q=60';
                       }}
                     />
@@ -377,7 +382,7 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
         )}
       </section>
 
-      {/* 5. Footer Business Card & 3D Globe Delivery Graphic (Matching Laptop Mockup Footer) */}
+      {/* 5. Footer Business Card */}
       <footer id="footer-section" style={styles.footer} className="glass-panel catalog-footer">
         <div style={styles.footerGrid} className="catalog-footer-grid">
           
@@ -516,7 +521,7 @@ export default function CustomerCatalog({ onNavigateToLogin }) {
   );
 }
 
-const styles = {
+const styles: Record<string, React.CSSProperties> = {
   container: {
     minHeight: '100vh',
     backgroundColor: '#07090e',
@@ -524,8 +529,6 @@ const styles = {
     textAlign: 'left',
     paddingBottom: '20px',
   },
-  
-  /* Navbar */
   navbar: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -626,8 +629,6 @@ const styles = {
     padding: '8px 0',
     cursor: 'pointer',
   },
-
-  /* Hero Section */
   heroSection: {
     padding: '60px 32px 40px 32px',
     maxWidth: '1300px',
@@ -737,8 +738,6 @@ const styles = {
     justifyContent: 'center',
     boxShadow: '0 4px 12px rgba(211, 30, 37, 0.5)',
   },
-
-  /* Categories Grid Section */
   categoriesSection: {
     padding: '0 32px 40px 32px',
     maxWidth: '1300px',
@@ -777,8 +776,6 @@ const styles = {
     color: 'var(--color-text-muted)',
     fontSize: '0.75rem',
   },
-
-  /* Subcategories Scroll */
   subcatContainer: {
     padding: '0 32px 30px 32px',
     maxWidth: '1300px',
@@ -800,8 +797,6 @@ const styles = {
     cursor: 'pointer',
     whiteSpace: 'nowrap',
   },
-
-  /* Featured Products Section */
   productsSection: {
     padding: '0 32px 60px 32px',
     maxWidth: '1300px',
@@ -911,8 +906,6 @@ const styles = {
     cursor: 'pointer',
     padding: 0,
   },
-
-  /* Footer */
   footer: {
     margin: '40px 32px 0 32px',
     padding: '40px 32px 20px 32px',
@@ -1054,8 +1047,6 @@ const styles = {
     fontSize: '0.75rem',
     color: 'var(--color-text-muted)',
   },
-
-  /* Modal */
   modalOverlay: {
     position: 'fixed',
     top: 0,

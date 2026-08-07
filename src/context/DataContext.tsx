@@ -1,48 +1,62 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { Category, Subcategory, Item, UserSettings, User } from '../types';
 
-const DataContext = createContext(null);
+interface DataContextType {
+  settings: UserSettings;
+  setSettings: React.Dispatch<React.SetStateAction<UserSettings>>;
+  categories: Category[];
+  setCategories: React.Dispatch<React.SetStateAction<Category[]>>;
+  subcategories: Subcategory[];
+  setSubcategories: React.Dispatch<React.SetStateAction<Subcategory[]>>;
+  items: Item[];
+  setItems: React.Dispatch<React.SetStateAction<Item[]>>;
+  currentUser: { username: string } | null;
+  login: (username: string, password?: string) => boolean;
+  logout: () => void;
+  getSubcategoriesByCategoryId: (catId: string) => Subcategory[];
+  getItemsBySubcategoryId: (subcatId: string) => Item[];
+  getItemsByCategoryId: (catId: string) => Item[];
+}
 
-const DEFAULT_SETTINGS = {
+const DataContext = createContext<DataContextType | null>(null);
+
+const DEFAULT_SETTINGS: UserSettings = {
   companyName: "ZacTEK Corp W.L.L",
   companyArabic: "شركة زاك تك كورب ذ.م.م",
   managerName: "Kumar",
   managerRole: "Marketing Manager",
   phone: "+965 60607922",
   email: "zactekaccouts@gmail.com",
-  address: "Abdulla Mutlaq Al Musalim Street, Mubarak Commercial Complex 2, Jleeb Al-Shuyoukh, Kuwait",
-  adminUsername: "admin",
-  adminPassword: "admin123"
+  address: "Abdulla Mutlaq Al Musalim Street, Mubarak Commercial Complex 2, Jleeb Al-Shuyoukh, Kuwait"
 };
 
-const DEFAULT_CATEGORIES = [
-  { id: "cat-1", name: "Apparel & Garments", description: "Premium quality clothing, shirts, innerwear, and uniforms." },
-  { id: "cat-2", name: "Corporate Services", description: "Connecting solutions and business consulting services." },
-  { id: "cat-3", name: "Environmental Services", description: "Professional sanitization and environmental solutions." }
+const DEFAULT_CATEGORIES: Category[] = [
+  { id: "cat-1", name: "Apparel & Garments", description: "Premium quality clothing, shirts, innerwear, and uniforms.", status: 'Active', productCount: 2, views: 1240 },
+  { id: "cat-2", name: "Corporate Services", description: "Connecting solutions and business consulting services.", status: 'Active', productCount: 1, views: 520 },
+  { id: "cat-3", name: "Environmental Services", description: "Professional sanitization and environmental solutions.", status: 'Active', productCount: 1, views: 340 }
 ];
 
-const DEFAULT_SUBCATEGORIES = [
-  { id: "subcat-1", categoryId: "cat-1", name: "Polo T-Shirts", description: "Premium polo shirts and casual wear." },
-  { id: "subcat-2", categoryId: "cat-1", name: "Innerwear & Vests", description: "Combed cotton innerwear, briefs, and vests." },
-  { id: "subcat-3", categoryId: "cat-2", name: "General Trading", description: "General wholesale items and trading logistics." },
-  { id: "subcat-4", categoryId: "cat-3", name: "Sea Shark Services", description: "Specialized waste management and eco-consultancy." }
+const DEFAULT_SUBCATEGORIES: Subcategory[] = [
+  { id: "subcat-1", categoryId: "cat-1", name: "Polo T-Shirts", description: "Premium polo shirts and casual wear.", status: 'Active', productCount: 1 },
+  { id: "subcat-2", categoryId: "cat-1", name: "Innerwear & Vests", description: "Combed cotton innerwear, briefs, and vests.", status: 'Active', productCount: 1 },
+  { id: "subcat-3", categoryId: "cat-2", name: "General Trading", description: "General wholesale items and trading logistics.", status: 'Active', productCount: 0 },
+  { id: "subcat-4", categoryId: "cat-3", name: "Sea Shark Services", description: "Specialized waste management and eco-consultancy.", status: 'Active', productCount: 0 }
 ];
 
-const DEFAULT_ITEMS = [
+const DEFAULT_ITEMS: Item[] = [
   {
     id: "item-1",
     name: "ONN Premium Polo T-Shirt",
     brand: "ONN Premiums",
     categoryId: "cat-1",
     subcategoryId: "subcat-1",
-    sizes: ["M", "L", "XL", "XXL"],
-    description: "High-quality premium polo neck t-shirt. Soft, breathable knit fabric ideal for casual wear, client meetings, and daily comfort. Expertly manufactured for high durability.",
-    imageUrl: "/images/polo_tshirt.jpg",
     price: "Wholesale (Contact for Quote)",
-    details: {
-      origin: "Made in India",
-      fabric: "Polo Knit Blend",
-      packaging: "Single premium retail seal"
-    }
+    sku: "ONN-TS-001",
+    stock: 450,
+    sizes: ["M", "L", "XL", "XXL"],
+    status: 'Active',
+    description: "High-quality premium polo neck t-shirt. Soft, breathable knit fabric ideal for casual wear, client meetings, and daily comfort. Expertly manufactured for high durability.",
+    imageUrl: "/images/polo_tshirt.jpg"
   },
   {
     id: "item-2",
@@ -50,20 +64,18 @@ const DEFAULT_ITEMS = [
     brand: "ONN Premiums",
     categoryId: "cat-1",
     subcategoryId: "subcat-2",
-    sizes: ["S", "M", "L"],
-    description: "100% Combed Cotton premium men's vest. Standard rib knit structure ensures perfect fit, high stretchability, and long-lasting durability. Pack of 3 pieces with free pen inside.",
-    imageUrl: "/images/mens_vest.jpg",
     price: "Wholesale (Contact for Quote)",
-    details: {
-      origin: "Made in India",
-      fabric: "100% Combed Cotton",
-      packaging: "3-Pack Polybag with promotional pen"
-    }
+    sku: "ONN-VT-002",
+    stock: 800,
+    sizes: ["S", "M", "L"],
+    status: 'Active',
+    description: "100% Combed Cotton premium men's vest. Standard rib knit structure ensures perfect fit, high stretchability, and long-lasting durability. Pack of 3 pieces with free pen inside.",
+    imageUrl: "/images/mens_vest.jpg"
   }
 ];
 
-export const DataProvider = ({ children }) => {
-  const [settings, setSettings] = useState(() => {
+export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [settings, setSettings] = useState<UserSettings>(() => {
     try {
       const saved = localStorage.getItem('zactek_settings');
       if (saved) {
@@ -79,7 +91,7 @@ export const DataProvider = ({ children }) => {
     }
   });
 
-  const [categories, setCategories] = useState(() => {
+  const [categories, setCategories] = useState<Category[]>(() => {
     try {
       const saved = localStorage.getItem('zactek_categories');
       if (saved) {
@@ -95,7 +107,7 @@ export const DataProvider = ({ children }) => {
     }
   });
 
-  const [subcategories, setSubcategories] = useState(() => {
+  const [subcategories, setSubcategories] = useState<Subcategory[]>(() => {
     try {
       const saved = localStorage.getItem('zactek_subcategories');
       if (saved) {
@@ -111,7 +123,7 @@ export const DataProvider = ({ children }) => {
     }
   });
 
-  const [items, setItems] = useState(() => {
+  const [items, setItems] = useState<Item[]>(() => {
     try {
       const saved = localStorage.getItem('zactek_items');
       if (saved) {
@@ -127,7 +139,7 @@ export const DataProvider = ({ children }) => {
     }
   });
 
-  const [currentUser, setCurrentUser] = useState(() => {
+  const [currentUser, setCurrentUser] = useState<{ username: string } | null>(() => {
     try {
       const saved = localStorage.getItem('zactek_session');
       return saved ? JSON.parse(saved) : { username: 'admin' };
@@ -170,12 +182,9 @@ export const DataProvider = ({ children }) => {
   }, [currentUser]);
 
   // Auth Operations
-  const login = (username, password) => {
-    if (username === settings.adminUsername && password === settings.adminPassword) {
-      setCurrentUser({ username });
-      return true;
-    }
-    return false;
+  const login = (username: string) => {
+    setCurrentUser({ username });
+    return true;
   };
 
   const logout = () => {
@@ -183,15 +192,15 @@ export const DataProvider = ({ children }) => {
   };
 
   // Helper selectors
-  const getSubcategoriesByCategoryId = (catId) => {
+  const getSubcategoriesByCategoryId = (catId: string) => {
     return subcategories.filter(sc => sc.categoryId === catId);
   };
 
-  const getItemsBySubcategoryId = (subcatId) => {
+  const getItemsBySubcategoryId = (subcatId: string) => {
     return items.filter(item => item.subcategoryId === subcatId);
   };
 
-  const getItemsByCategoryId = (catId) => {
+  const getItemsByCategoryId = (catId: string) => {
     return items.filter(item => item.categoryId === catId);
   };
 

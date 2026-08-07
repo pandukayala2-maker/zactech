@@ -86,7 +86,6 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
       return DEFAULT_SETTINGS;
     } catch (e) {
-      console.error("Failed to parse settings", e);
       return DEFAULT_SETTINGS;
     }
   });
@@ -96,13 +95,10 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const saved = localStorage.getItem('zactek_categories');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          return parsed;
-        }
+        if (Array.isArray(parsed)) return parsed;
       }
       return DEFAULT_CATEGORIES;
     } catch (e) {
-      console.error("Failed to parse categories", e);
       return DEFAULT_CATEGORIES;
     }
   });
@@ -112,13 +108,10 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const saved = localStorage.getItem('zactek_subcategories');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          return parsed;
-        }
+        if (Array.isArray(parsed)) return parsed;
       }
       return DEFAULT_SUBCATEGORIES;
     } catch (e) {
-      console.error("Failed to parse subcategories", e);
       return DEFAULT_SUBCATEGORIES;
     }
   });
@@ -128,13 +121,10 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const saved = localStorage.getItem('zactek_items');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          return parsed;
-        }
+        if (Array.isArray(parsed)) return parsed;
       }
       return DEFAULT_ITEMS;
     } catch (e) {
-      console.error("Failed to parse items", e);
       return DEFAULT_ITEMS;
     }
   });
@@ -148,29 +138,43 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   });
 
+  // Fetch initial data from Express API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [resCat, resSub, resItems, resSettings] = await Promise.all([
+          fetch('/api/categories').then(res => res.ok ? res.json() : null).catch(() => null),
+          fetch('/api/subcategories').then(res => res.ok ? res.json() : null).catch(() => null),
+          fetch('/api/items').then(res => res.ok ? res.json() : null).catch(() => null),
+          fetch('/api/settings').then(res => res.ok ? res.json() : null).catch(() => null)
+        ]);
+
+        if (resCat && Array.isArray(resCat)) setCategories(resCat);
+        if (resSub && Array.isArray(resSub)) setSubcategories(resSub);
+        if (resItems && Array.isArray(resItems)) setItems(resItems);
+        if (resSettings && typeof resSettings === 'object') setSettings(resSettings);
+      } catch (err) {
+        console.log('Backend API offline or unreachable, using local state fallback');
+      }
+    };
+    fetchData();
+  }, []);
+
   // Sync state to LocalStorage
   useEffect(() => {
-    if (settings) {
-      localStorage.setItem('zactek_settings', JSON.stringify(settings));
-    }
+    if (settings) localStorage.setItem('zactek_settings', JSON.stringify(settings));
   }, [settings]);
 
   useEffect(() => {
-    if (categories) {
-      localStorage.setItem('zactek_categories', JSON.stringify(categories));
-    }
+    if (categories) localStorage.setItem('zactek_categories', JSON.stringify(categories));
   }, [categories]);
 
   useEffect(() => {
-    if (subcategories) {
-      localStorage.setItem('zactek_subcategories', JSON.stringify(subcategories));
-    }
+    if (subcategories) localStorage.setItem('zactek_subcategories', JSON.stringify(subcategories));
   }, [subcategories]);
 
   useEffect(() => {
-    if (items) {
-      localStorage.setItem('zactek_items', JSON.stringify(items));
-    }
+    if (items) localStorage.setItem('zactek_items', JSON.stringify(items));
   }, [items]);
 
   useEffect(() => {
@@ -191,7 +195,6 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setCurrentUser(null);
   };
 
-  // Helper selectors
   const getSubcategoriesByCategoryId = (catId: string) => {
     return subcategories.filter(sc => sc.categoryId === catId);
   };
